@@ -57,7 +57,7 @@ def parse_quality(qual: str):
 
 
 def is_acceptable_quality(qual: float, pos: int, threshold: int=10, alt_quality: dict=None):
-     if alt_quality is None:
+    if alt_quality is None:
          alt_quality = {}
     if qual is None:
         return False
