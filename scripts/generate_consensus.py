@@ -3,6 +3,8 @@
 import argparse
 import csv
 import logging
+from pathlib import Path
+from typing import TextIO
 
 logging.basicConfig(
     level=logging.INFO,
