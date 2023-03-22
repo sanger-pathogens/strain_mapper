@@ -11,17 +11,17 @@ logging.basicConfig(
 )
 
 
-def get_chrom_id_and_size(ref_index):
+def get_chrom_id_and_size(ref_index: Path):
     with open(ref_index, "r") as f:
         seq_id, size, _ = f.readline().split(maxsplit=2)
     return seq_id, int(size)
 
 
-def initialise_seq(chrom_size):
+def initialise_seq(chrom_size: int):
     return ["-"] * chrom_size
 
 
-def parse_lines(fh):
+def parse_lines(fh: TextIO):
     prev_pos = fh.tell()
     while line := fh.readline():
         current_pos = fh.tell()
@@ -32,7 +32,7 @@ def parse_lines(fh):
     return csv.DictReader(fh, delimiter="\t")
 
 
-def parse_position(pos):
+def parse_position(pos: str):
     try:
         pos = int(pos)  # reference nucleotide position converted to int
     except ValueError:
@@ -44,7 +44,7 @@ def parse_position(pos):
         return pos
 
 
-def parse_quality(qual):
+def parse_quality(qual: str):
     try:
         qual = float(qual)
     except ValueError:
@@ -56,7 +56,9 @@ def parse_quality(qual):
         return qual
 
 
-def is_acceptable_quality(qual, pos, threshold=10, alt_quality={}):
+def is_acceptable_quality(qual: float, pos: int, threshold: int=10, alt_quality: dict=None):
+     if alt_quality is None:
+         alt_quality = {}
     if qual is None:
         return False
     if qual > threshold or (pos in alt_quality and qual > alt_quality[pos]):
@@ -75,7 +77,7 @@ def assign_nt_to_seq(seq, pos, ref, alt):
 
 
 def get_seq(
-    vcf, ref_index, qual_threshold=10, alt_quality={}
+    vcf, ref_index, qual_threshold=10, alt_quality=None
 ):  # TODO: Bother to keep altQuality?
     chrom_id, chrom_size = get_chrom_id_and_size(ref_index)
     seq = initialise_seq(chrom_size)
