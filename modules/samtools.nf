@@ -41,65 +41,6 @@ process SAMTOOLS_SORT {
     """
 }
 
-process SORT_REF {
-    label 'process_low'
-    publishDir "${params.outdir}/sorted_ref", mode: 'copy', overwrite: true
-
-    container 'quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2'
-
-    input:
-    path(reference)
-
-    output:
-    path("${sorted_ref}"),  emit: sorted_ref
-    stdout emit: ref_length
-
-    script:
-    sorted_ref = "${reference}.sorted"
-    faidx = file("${reference}.fai")
-    """
-    faidx_path="${faidx}"
-    if [ ! -s \${faidx_path} ]; then
-        faidx_path=\$(basename "\${faidx_path}")
-        samtools faidx "${reference}" > "\${faidx_path}"
-    fi
-    while read line; do
-        seq_id=\$(awk '{print \$1}' <<< \${line})
-        samtools faidx "${reference}" "\${seq_id}" 
-    done < \${faidx_path} > ${sorted_ref}
-
-    # Output length of largest sequence to stdout
-    head -n 1 \${faidx_path} | awk '{print \$2}'
-    """
-}
-
-process GET_CHROM_ID_AND_SIZE {
-    label 'process_low'
-    publishDir "${params.outdir}/sorted_ref", mode: 'copy', overwrite: true
-
-    container 'quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2'
-
-    input:
-    path(reference)
-
-    output:
-    stdout emit: stdout
-
-    script:
-    sorted_ref = "${reference}.sorted"
-    faidx = file("${reference}.fai")
-    """
-    faidx_path="${faidx}"
-    if [ ! -s \${faidx_path} ]; then
-        faidx_path=\$(basename "\${faidx_path}")
-        samtools faidx "${reference}" > "\${faidx_path}"
-    fi
-
-    # Output seq_id and length of largest sequence to stdout
-    head -n 1 \${faidx_path} | awk '{print \$1,\$2}'
-    """
-}
-
 process INDEX_REF {
     label 'process_low'
     publishDir "${params.outdir}/sorted_ref", mode: 'copy', overwrite: true

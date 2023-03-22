@@ -14,8 +14,6 @@ process BCFTOOLS_MPILEUP {
 
     script:
     mpileup_file = "${meta.id}.mpileup"
-    //TODO: Original code had `samtools mpileup -uf`. Was the -u accidental? It's not documented...
-    // There is a bcftools mpileup -0u option, so I think the program used was wrong. 
     """
     bcftools mpileup -o ${mpileup_file} \
                      -O 'u' \

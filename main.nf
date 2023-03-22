@@ -103,16 +103,10 @@ workflow {
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
     //
     reference = file(params.reference, checkIfExists: true)
-    // reference_dir = file(params.reference, checkIfExists: true).getParent()
-    // index_files = file(reference_dir, "*.bt2")
     ch_input = file(params.input)
     INPUT_CHECK (
         ch_input
     )
-    INPUT_CHECK.out.shortreads.dump(tag: 'shortreads')
-        .map{ meta, reads -> tuple(meta, reads, reference) }
-        .dump(tag: 'ch_for_mapping')
-        .set { ch_for_mapping }
     INPUT_CHECK.out.shortreads
         .dump(tag: 'ch_reads')
         .set { ch_reads }
@@ -139,25 +133,6 @@ workflow {
         ch_bt2_index 
     )
     BOWTIE2.out.mapped_reads.dump(tag: 'bowtie2').set { ch_mapped }
-
-    // SORT REFERENCE AND GET CHROM LENGTH
-    // SORT_REF(
-    //     reference
-    // )
-    // SORT_REF.out.sorted_ref.dump(tag: 'sorted_ref').set { ch_sorted_ref }
-    // SORT_REF.out.ref_length.dump(tag: 'raw_ref_length')
-    //     .map { raw_length -> raw_length.trim() }
-    //     .dump(tag: 'ref_length')
-    //     .set { ch_ref_length }
-    //// or...
-    // GET_CHROM_ID_AND_SIZE(
-    //     reference
-    // )
-    // GET_CHROM_ID_AND_SIZE.out.stdout.dump(tag: 'stdout_get_chrom_id_and_size')
-    //     .map { stdout -> stdout.trim().split() }
-    //     .map { elems -> ['seq_id':elems[0], 'size':elems[1]] }
-    //     .dump(tag: 'chrom_id_and_size')
-    //     .set { chrom_id_and_size }
 
     // INDEX REF FASTA
     faidx_file = file("${reference}.fai")
