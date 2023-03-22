@@ -80,7 +80,7 @@ def get_seq(
     vcf, ref_index, qual_threshold=10, alt_quality=None
 ):  # TODO: Bother to keep altQuality?
     chrom_id, chrom_size = get_chrom_id_and_size(ref_index)
-    seq = initialise_seq(chrom_size)
+    seq = []
     with open(vcf, "r", newline="") as f:
         parsed_lines = parse_lines(f)
         for line in parsed_lines:
@@ -93,6 +93,7 @@ def get_seq(
                 logging.warning(
                     f"The following line had an unexpected quality value: {line}"
                 )
+                seq.append("-")
                 continue
             if seq_id == chrom_id:
                 if is_acceptable_quality(
