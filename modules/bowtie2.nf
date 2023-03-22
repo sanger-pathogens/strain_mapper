@@ -1,0 +1,42 @@
+process BOWTIE2 {
+    label 'process_medium'
+    publishDir "${params.outdir}/bowtie2", mode: 'copy', overwrite: true
+
+    container 'quay.io/biocontainers/bowtie2:2.5.1--py310h8d7afc0_0'
+
+    input:
+    tuple val(meta), file(reads)
+    tuple val(ref_without_extension), path(bt2_index_files)
+
+    output:
+    tuple val(meta), path("${mapped_reads}"),  emit: mapped_reads
+
+    script:
+    mapped_reads = "${meta.id}.sam"
+    //TODO: Original code used `-U ${reads[2]}` option to also map unpaired reads - need to include in manifest and validate NA values if unpaired file doesn't exist
+    """
+    bowtie2 -x ${ref_without_extension} \
+            -1 ${reads[0]} -2 ${reads[1]} \
+            -S ${mapped_reads} \
+            -p ${task.cpus}
+    """
+}
+
+process BOWTIE2_INDEX {
+    label 'process_medium'
+    publishDir "${params.outdir}/bowtie2", mode: 'copy', overwrite: true
+
+    container 'quay.io/biocontainers/bowtie2:2.5.1--py310h8d7afc0_0'
+
+    input:
+    path(reference)
+
+    output:
+    tuple val(ref_basename), path("${reference.baseName}*.bt2"),  emit: bt2_index
+
+    script:
+    ref_basename = "${reference.baseName}"
+    """
+    bowtie2-build ${reference} ${ref_basename}
+    """
+}
