@@ -24,14 +24,11 @@ def initialise_seq(chrom_size: int):
 
 
 def parse_lines(fh: TextIO):
-    prev_pos = fh.tell()
-    while line := fh.readline():
-        current_pos = fh.tell()
+    for line in fh:
         if not line.startswith("##"):
-            fh.seek(prev_pos + 1)  # Skip '#' at start of header line
+            header = line.lstrip("#").split()
             break
-        prev_pos = current_pos
-    return csv.DictReader(fh, delimiter="\t")
+    return csv.DictReader(fh, delimiter="\t", fieldnames=header)
 
 
 def parse_position(pos: str):
