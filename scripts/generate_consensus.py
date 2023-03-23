@@ -59,7 +59,7 @@ def is_acceptable_quality(qual: float, pos: int, threshold: int=10, alt_quality:
     return False
 
 
-def assign_nt_to_seq(seq, pos, ref, alt):
+def assign_nt_to_seq(seq: str, pos: int, ref: str, alt: str):
     if len(ref) == 1 and len(alt) == 1:
         if alt == ".":
             # if the mapped strain is the same as the query, then it is reported as a '.'
@@ -70,7 +70,7 @@ def assign_nt_to_seq(seq, pos, ref, alt):
 
 
 def get_seq(
-    vcf, ref_index, qual_threshold=10, alt_quality=None
+    vcf: Path, ref_index: Path, qual_threshold: float=10, alt_quality: dict=None
 ):  # TODO: Bother to keep altQuality?
     chrom_id, chrom_size = get_chrom_id_and_size(ref_index)
     seq = initialise_seq(chrom_size)
@@ -94,7 +94,7 @@ def get_seq(
     return "".join(seq)
 
 
-def write_seq(seq, seq_id, output_fasta="out.fa"):
+def write_seq(seq: str, seq_id: str, output_fasta: str="out.fa"):
     with open(output_fasta, "w") as f:
         seq_header = f">{seq_id}"
         f.write("\n".join([seq_header, seq]))
