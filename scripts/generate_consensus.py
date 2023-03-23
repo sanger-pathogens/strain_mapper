@@ -60,6 +60,9 @@ def is_acceptable_quality(qual: float, pos: int, threshold: int=10, alt_quality:
 
 
 def get_nt_to_add(ref: str, alt: str):
+    if len(alt) > 1:
+        # if mutiple bases called at a position
+        return "-"
     if alt == ".":
         # if the mapped strain is the same as the query, then it is reported as a '.'
         return ref
