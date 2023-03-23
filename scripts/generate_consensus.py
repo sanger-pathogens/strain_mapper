@@ -6,12 +6,6 @@ import logging
 from pathlib import Path
 from typing import TextIO
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
-
 
 def get_chrom_id_and_size(ref_index: Path):
     with open(ref_index, "r") as f:
