@@ -59,38 +59,47 @@ def is_acceptable_quality(qual: float, pos: int, threshold: int=10, alt_quality:
     return False
 
 
-def assign_nt_to_seq(seq: str, pos: int, ref: str, alt: str):
-    if len(ref) == 1 and len(alt) == 1:
-        if alt == ".":
-            # if the mapped strain is the same as the query, then it is reported as a '.'
-            seq[pos - 1] = ref
-        else:
-            # for SNPs
-            seq[pos - 1] = alt
+def get_nt_to_add(ref: str, alt: str):
+    if len(alt) > 1:
+        # if mutiple bases called at a position
+        return "-"
+    if alt == ".":
+        # if the mapped strain is the same as the query, then it is reported as a '.'
+        return ref
+    # for SNPs
+    return alt
 
 
 def get_seq(
     vcf: Path, ref_index: Path, qual_threshold: float=10, alt_quality: dict=None
 ):  # TODO: Bother to keep altQuality?
     chrom_id, chrom_size = get_chrom_id_and_size(ref_index)
-    seq = initialise_seq(chrom_size)
+    seq = []
+    seq_count = 0
     with open(vcf, "r", newline="") as f:
         parsed_lines = parse_lines(f)
         for line in parsed_lines:
+            seq_count += 1
             seq_id = line["CHROM"]
             ref = line["REF"]  # reference base
             alt = line["ALT"]  # alternative base
             pos = parse_position(line["POS"])
             qual = parse_quality(line["QUAL"])
-            if qual is None:
-                logging.warning(
-                    f"The following line had an unexpected quality value: {line}"
-                )
-                continue
-            if seq_id == chrom_id and is_acceptable_quality(
-                qual, pos, qual_threshold, alt_quality
-            ):
-                assign_nt_to_seq(seq, pos, ref, alt)
+            while seq_count < pos:
+                seq.append("-")
+                seq_count += 1
+            if seq_id == chrom_id:
+                if qual is None:
+                    logging.warning(
+                        f"The following line had an unexpected quality value: {line}"
+                    )
+                if is_acceptable_quality(
+                    qual, pos, qual_threshold, alt_quality
+                ):
+                    seq.append(get_nt_to_add(ref, alt))
+                else:
+                    seq.append("-")
+    assert len(seq) == chrom_size
     return "".join(seq)
 
 
