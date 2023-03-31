@@ -103,6 +103,8 @@ workflow {
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
     //
     reference = file(params.reference, checkIfExists: true)
+    Channel.fromPath(reference).set { ch_ref }
+
     ch_input = file(params.input)
     INPUT_CHECK (
         ch_input
@@ -157,9 +159,13 @@ workflow {
     )
     SAMTOOLS_SORT.out.sorted_reads.dump(tag: 'sorted_reads').set { ch_sorted_reads }
 
+    ch_sorted_reads
+        .combine(ch_ref)
+        .combine(ch_ref_index)
+        .dump(tag: 'sorted_reads_and_ref').set { sorted_reads_and_ref }
+
     BCFTOOLS_MPILEUP(
-        ch_sorted_reads,
-        Channel.fromPath(reference)
+        sorted_reads_and_ref
     )
     BCFTOOLS_MPILEUP.out.mpileup_file.dump(tag: 'mpileup_file').set { ch_mpileup_file }
 
@@ -169,7 +175,8 @@ workflow {
     BCFTOOLS_CALL.out.vcf_final.dump(tag: 'vcf_final').set { ch_vcf_final }
 
     CURATE(
-        ch_vcf_final, ch_ref_index
+        ch_vcf_final,
+        ch_ref_index
     )
     CURATE.out.curated.dump(tag: 'curated').set { ch_curated }
 }
