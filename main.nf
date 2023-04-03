@@ -103,7 +103,6 @@ workflow {
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
     //
     reference = file(params.reference, checkIfExists: true)
-    Channel.fromPath(reference).set { ch_ref }
 
     ch_input = file(params.input)
     INPUT_CHECK (
