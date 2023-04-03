@@ -139,7 +139,7 @@ workflow {
     // INDEX REF FASTA
     faidx_file = file("${reference}.fai")
     if (faidx_file.isFile()) {
-        Channel.fromPath(faidx_file).set { ch_ref_index }
+        Channel.from([ reference, faidx_file ]).set { ch_ref_index }
     } else {
         INDEX_REF(
             reference
@@ -160,7 +160,6 @@ workflow {
     SAMTOOLS_SORT.out.sorted_reads.dump(tag: 'sorted_reads').set { ch_sorted_reads }
 
     ch_sorted_reads
-        .combine(ch_ref)
         .combine(ch_ref_index)
         .dump(tag: 'sorted_reads_and_ref').set { sorted_reads_and_ref }
 
