@@ -102,8 +102,6 @@ workflow {
     //
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
     //
-    reference = file(params.reference, checkIfExists: true)
-
     ch_input = file(params.input)
     INPUT_CHECK (
         ch_input
@@ -113,6 +111,7 @@ workflow {
         .set { ch_reads }
 
     // BOWTIE2 INDEX
+    reference = file(params.reference, checkIfExists: true)
     ref_without_extension = "${reference.parent}/${reference.baseName}"
     bt2_index_files = file("${ref_without_extension}*.bt2")
     if (bt2_index_files) {
