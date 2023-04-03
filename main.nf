@@ -110,8 +110,12 @@ workflow {
         .dump(tag: 'ch_reads')
         .set { ch_reads }
 
-    // BOWTIE2 INDEX
+    //
+    // REFERENCE PROCESSING 
+    //
     reference = file(params.reference, checkIfExists: true)
+
+    // BOWTIE2 INDEX
     ref_without_extension = "${reference.parent}/${reference.baseName}"
     bt2_index_files = file("${ref_without_extension}*.bt2")
     if (bt2_index_files) {
@@ -127,15 +131,7 @@ workflow {
         BOWTIE2_INDEX.out.bt2_index.dump(tag: 'bt2_index').set { ch_bt2_index }
     }
 
-    // MAPPING: Bowtie2
-    BOWTIE2 (
-        ch_reads,
-        ch_bt2_index 
-    )
-    BOWTIE2.out.mapped_reads.dump(tag: 'bowtie2').set { ch_mapped }
-
     // INDEX REF FASTA
-    reference = file(params.reference, checkIfExists: true)
     faidx_file = file("${reference}.fai")
     if (faidx_file.isFile()) {
         Channel.from( [reference, faidx_file] ).set { ch_ref_index }
@@ -146,8 +142,18 @@ workflow {
         INDEX_REF.out.ref_index.dump(tag: 'ref_index').set { ch_ref_index }
     }
     
+    //
+    // MAPPING: Bowtie2
+    //
+    BOWTIE2 (
+        ch_reads,
+        ch_bt2_index 
+    )
+    BOWTIE2.out.mapped_reads.dump(tag: 'bowtie2').set { ch_mapped }
 
+    //
     // POST-PROCESSING
+    //
     CONVERT_TO_BAM(
         ch_mapped
     )
