@@ -135,6 +135,7 @@ workflow {
     BOWTIE2.out.mapped_reads.dump(tag: 'bowtie2').set { ch_mapped }
 
     // INDEX REF FASTA
+    reference = file(params.reference, checkIfExists: true)
     faidx_file = file("${reference}.fai")
     if (faidx_file.isFile()) {
         Channel.from( [reference, faidx_file] ).set { ch_ref_index }
