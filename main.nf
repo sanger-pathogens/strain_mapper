@@ -137,7 +137,7 @@ workflow {
     // INDEX REF FASTA
     faidx_file = file("${reference}.fai")
     if (faidx_file.isFile()) {
-        Channel.from([ reference, faidx_file ]).set { ch_ref_index }
+        Channel.from( [reference, faidx_file] ).set { ch_ref_index }
     } else {
         INDEX_REF(
             reference
