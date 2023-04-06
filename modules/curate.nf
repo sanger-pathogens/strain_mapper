@@ -6,13 +6,13 @@ process CURATE {
 
     input:
     tuple val(meta), file(vcf_final)
-    path(ref_index)
+    tuple path(reference), path(ref_index)
 
     output:
     tuple val(meta), path("*.fa"),  emit: curated
 
     script:
-    ref_basename = file(params.reference).baseName
+    ref_basename = reference.baseName
     align_script = "${projectDir}/scripts/generate_consensus.py"
     """
     python3 ${align_script} -v '${vcf_final}' -i '${ref_index}' -o '${meta.id}_${ref_basename}.fa' -s '${meta.id}'

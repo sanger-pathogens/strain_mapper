@@ -51,7 +51,7 @@ process INDEX_REF {
     path(reference)
 
     output:
-    path("${faidx}"), emit: ref_index
+    tuple path(reference), path("${faidx}"),  emit: ref_index
 
     script:
     faidx = "${reference}.fai"

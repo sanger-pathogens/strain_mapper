@@ -102,9 +102,6 @@ workflow {
     //
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
     //
-    reference = file(params.reference, checkIfExists: true)
-    Channel.fromPath(reference).set { ch_ref }
-
     ch_input = file(params.input)
     INPUT_CHECK (
         ch_input
@@ -112,6 +109,11 @@ workflow {
     INPUT_CHECK.out.shortreads
         .dump(tag: 'ch_reads')
         .set { ch_reads }
+
+    //
+    // REFERENCE PROCESSING 
+    //
+    reference = file(params.reference, checkIfExists: true)
 
     // BOWTIE2 INDEX
     ref_without_extension = "${reference.parent}/${reference.baseName}"
@@ -129,17 +131,10 @@ workflow {
         BOWTIE2_INDEX.out.bt2_index.dump(tag: 'bt2_index').set { ch_bt2_index }
     }
 
-    // MAPPING: Bowtie2
-    BOWTIE2 (
-        ch_reads,
-        ch_bt2_index 
-    )
-    BOWTIE2.out.mapped_reads.dump(tag: 'bowtie2').set { ch_mapped }
-
     // INDEX REF FASTA
     faidx_file = file("${reference}.fai")
     if (faidx_file.isFile()) {
-        Channel.fromPath(faidx_file).set { ch_ref_index }
+        Channel.from( [reference, faidx_file] ).set { ch_ref_index }
     } else {
         INDEX_REF(
             reference
@@ -147,8 +142,18 @@ workflow {
         INDEX_REF.out.ref_index.dump(tag: 'ref_index').set { ch_ref_index }
     }
     
+    //
+    // MAPPING: Bowtie2
+    //
+    BOWTIE2 (
+        ch_reads,
+        ch_bt2_index 
+    )
+    BOWTIE2.out.mapped_reads.dump(tag: 'bowtie2').set { ch_mapped }
 
+    //
     // POST-PROCESSING
+    //
     CONVERT_TO_BAM(
         ch_mapped
     )
@@ -160,7 +165,6 @@ workflow {
     SAMTOOLS_SORT.out.sorted_reads.dump(tag: 'sorted_reads').set { ch_sorted_reads }
 
     ch_sorted_reads
-        .combine(ch_ref)
         .combine(ch_ref_index)
         .dump(tag: 'sorted_reads_and_ref').set { sorted_reads_and_ref }
 
