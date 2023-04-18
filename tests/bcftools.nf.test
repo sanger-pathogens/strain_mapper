@@ -1,0 +1,57 @@
+nextflow_process {
+
+    name "Test Process BCFTOOLS_MPILEUP"
+    script "modules/bcftools.nf"
+    process "BCFTOOLS_MPILEUP"
+
+    test("Should run without failures") {
+
+        when {
+            params {
+                max_cpus   = "1"
+                max_memory = "2.GB"
+                max_time   = "1.h"
+                outdir = "${outputDir}"
+            }
+            process {
+                """
+                input[0] = [["id": "12483_8#10"], file("test_data/outputs/results/samtools_sorted/12483_8#10_sorted.bam"), file("test_data/inputs/ref/GCF_000011265.1.fna"), file("test_data/inputs/ref/GCF_000011265.1.fna.fai")]
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            // assert snapshot(process.out.curated).match()
+        }
+
+    }
+
+    name "Test Process BCFTOOLS_CALL"
+    script "modules/bcftools.nf"
+    process "BCFTOOLS_CALL"
+
+    test("Should run without failures") {
+
+        when {
+            params {
+                max_cpus   = "1"
+                max_memory = "2.GB"
+                max_time   = "1.h"
+                outdir = "${outputDir}"
+            }
+            process {
+                """
+                input[0] = [["id": "12483_8#10"], file("test_data/outputs/results/bcftools_mpileup/12483_8#10.mpileup")]
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            // assert snapshot(process.out.curated).match()
+        }
+
+    }
+
+}

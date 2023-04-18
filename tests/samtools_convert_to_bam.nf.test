@@ -1,0 +1,30 @@
+nextflow_process {
+
+    name "Test Process CONVERT_TO_BAM"
+    script "modules/samtools.nf"
+    process "CONVERT_TO_BAM"
+
+    test("Should run without failures") {
+
+        when {
+            params {
+                max_cpus   = "1"
+                max_memory = "2.GB"
+                max_time   = "1.h"
+                outdir = "${outputDir}"
+            }
+            process {
+                """
+                input[0] = [["id": "12483_8#10"], file("test_data/inputs/bowtie2/12483_8#10.sam")]
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert snapshot(process.out.curated).match()
+        }
+
+    }
+
+}
