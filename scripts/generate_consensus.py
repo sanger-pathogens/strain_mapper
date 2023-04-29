@@ -74,20 +74,15 @@ def get_seq(
     vcf: Path, ref_index: Path, qual_threshold: float=10
 ):
     chrom_id, chrom_size = get_chrom_id_and_size(ref_index)
-    seq = []
-    seq_count = 0
+    seq = ['-'] * chrom_size
     with open(vcf, "r", newline="") as f:
         parsed_lines = parse_lines(f)
         for line in parsed_lines:
-            seq_count += 1
             seq_id = line["CHROM"]
             ref = line["REF"]  # reference base
             alt = line["ALT"]  # alternative base
             pos = parse_position(line["POS"])
             qual = parse_quality(line["QUAL"])
-            while seq_count < pos:
-                seq.append("-")
-                seq_count += 1
             if seq_id == chrom_id:
                 if qual is None:
                     logging.warning(
@@ -96,9 +91,7 @@ def get_seq(
                 if is_acceptable_quality(
                     qual, pos, qual_threshold
                 ):
-                    seq.append(get_nt_to_add(ref, alt))
-                else:
-                    seq.append("-")
+                    seq[pos - 1] = get_nt_to_add(ref, alt)
     assert len(seq) == chrom_size
     return "".join(seq)
 
