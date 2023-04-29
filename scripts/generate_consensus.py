@@ -71,8 +71,8 @@ def get_nt_to_add(ref: str, alt: str):
 
 
 def get_seq(
-    vcf: Path, ref_index: Path, qual_threshold: float=10, alt_quality: dict=None
-):  # TODO: Bother to keep altQuality?
+    vcf: Path, ref_index: Path, qual_threshold: float=10
+):
     chrom_id, chrom_size = get_chrom_id_and_size(ref_index)
     seq = []
     seq_count = 0
@@ -94,7 +94,7 @@ def get_seq(
                         f"The following line had an unexpected quality value: {line}"
                     )
                 if is_acceptable_quality(
-                    qual, pos, qual_threshold, alt_quality
+                    qual, pos, qual_threshold
                 ):
                     seq.append(get_nt_to_add(ref, alt))
                 else:
