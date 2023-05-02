@@ -5,8 +5,7 @@ process CURATE {
     container 'quay.io/biocontainers/python:3.10.2'
 
     input:
-    tuple val(meta), file(vcf_final)
-    tuple path(reference), path(ref_index)
+    tuple val(meta), file(vcf_final), path(reference), path(ref_index)
 
     output:
     tuple val(meta), path("*.fa"),  emit: curated
