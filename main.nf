@@ -134,7 +134,7 @@ workflow {
     // INDEX REF FASTA
     faidx_file = file("${reference}.fai")
     if (faidx_file.isFile()) {
-        Channel.from( [reference, faidx_file] ).set { ch_ref_index }
+        Channel.of( [reference, faidx_file] ).dump(tag: 'ref_index').set { ch_ref_index }
     } else {
         INDEX_REF(
             reference
@@ -166,7 +166,8 @@ workflow {
 
     ch_sorted_reads
         .combine(ch_ref_index)
-        .dump(tag: 'sorted_reads_and_ref').set { sorted_reads_and_ref }
+        .dump(tag: 'sorted_reads_and_ref')
+        .set { sorted_reads_and_ref }
 
     BCFTOOLS_MPILEUP(
         sorted_reads_and_ref
@@ -178,9 +179,13 @@ workflow {
     )
     BCFTOOLS_CALL.out.vcf_final.dump(tag: 'vcf_final').set { ch_vcf_final }
 
+    ch_vcf_final
+        .combine(ch_ref_index)
+        .dump(tag: 'vcf_and_ref')
+        .set { ch_vcf_and_ref }
+
     CURATE(
-        ch_vcf_final,
-        ch_ref_index
+        ch_vcf_and_ref
     )
     CURATE.out.curated.dump(tag: 'curated').set { ch_curated }
 }
