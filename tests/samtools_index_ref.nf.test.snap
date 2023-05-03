@@ -1,6 +1,13 @@
 {
     "Should run without failures": {
-        "content": null,
-        "timestamp": "2023-04-17T14:54:05+0000"
+        "content": [
+            [
+                [
+                    "GCF_000011265.1.fna:md5,5a1ae4a1d3701bbdc9e731c9fdc06aea",
+                    "GCF_000011265.1.fna.fai:md5,4e0be5b6476737da0c93061a13c6d35b"
+                ]
+            ]
+        ],
+        "timestamp": "2023-05-03T14:50:20+0000"
     }
 }

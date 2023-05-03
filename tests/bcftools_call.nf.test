@@ -22,7 +22,7 @@ nextflow_process {
 
         then {
             assert process.success
-            assert snapshot(process.out.curated).match()
+            assert snapshot(process.out.vcf_final).match()
         }
 
     }
