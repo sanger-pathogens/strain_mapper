@@ -15,7 +15,7 @@ nextflow_process {
             }
             process {
                 """
-                input[0] = [["id": "12483_8#10"], file("test_data/outputs/results/bcftools_call/12483_8#10.vcf")]
+                input[0] = [["id": "12483_8#10"], file("test_data/inputs/bcftools_call/12483_8#10.vcf")]
                 input[1] =  [file("test_data/inputs/ref/GCF_000011265.1.fna"), file("test_data/inputs/ref/GCF_000011265.1.fna.fai")]
                 """
             }
