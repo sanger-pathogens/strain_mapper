@@ -1,0 +1,15 @@
+{
+    "Should run without failures": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "12483_8#10"
+                    },
+                    "12483_8#10.mpileup:md5,525341dcb01cca586188257b4355b658"
+                ]
+            ]
+        ],
+        "timestamp": "2023-05-03T15:17:37+0000"
+    }
+}

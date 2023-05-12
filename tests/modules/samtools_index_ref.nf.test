@@ -1,0 +1,30 @@
+nextflow_process {
+
+    name "Test Process INDEX_REF"
+    script "modules/samtools.nf"
+    process "INDEX_REF"
+
+    test("Should run without failures") {
+
+        when {
+            params {
+                max_cpus   = "1"
+                max_memory = "2.GB"
+                max_time   = "1.h"
+                outdir = "${outputDir}"
+            }
+            process {
+                """
+                input[0] = [file("test_data/inputs/ref/GCF_000011265.1.fna")]
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert snapshot(process.out.ref_index).match()
+        }
+
+    }
+
+}

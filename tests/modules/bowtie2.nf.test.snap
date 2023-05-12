@@ -1,0 +1,15 @@
+{
+    "Should run without failures": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "12483_8#10"
+                    },
+                    "12483_8#10.sam:md5,a420548a0812a6853172dd8d38dd8f98"
+                ]
+            ]
+        ],
+        "timestamp": "2023-05-03T15:12:30+0000"
+    }
+}

@@ -1,0 +1,3 @@
+[submodule "tests/lib/groovy-compare"]
+	path = tests/lib/groovy-compare
+	url = git@gitlab.internal.sanger.ac.uk:sanger-pathogens/groovy-compare.git

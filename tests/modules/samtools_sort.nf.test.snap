@@ -1,0 +1,15 @@
+{
+    "Should run without failures": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "12483_8#10"
+                    },
+                    "12483_8#10_sorted.bam:md5,e1b527413f379c6f5219e47589ed53b0"
+                ]
+            ]
+        ],
+        "timestamp": "2023-05-03T15:14:26+0000"
+    }
+}

@@ -1,0 +1,30 @@
+nextflow_process {
+
+    name "Test Process SAMTOOLS_SORT"
+    script "modules/samtools.nf"
+    process "SAMTOOLS_SORT"
+
+    test("Should run without failures") {
+
+        when {
+            params {
+                max_cpus   = "1"
+                max_memory = "2.GB"
+                max_time   = "1.h"
+                outdir = "${outputDir}"
+            }
+            process {
+                """
+                input[0] = [["id": "12483_8#10"], file("test_data/inputs/samtools_view/12483_8#10.bam")]
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert snapshot(process.out.sorted_reads).match()
+        }
+
+    }
+
+}

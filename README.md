@@ -85,6 +85,27 @@ Options:
    --outdir                     Specify output directory [default: ./results] (optional)
    --help                       Print this help message (optional)
 ```
+## Contributions and testing
+
+Developer contributions to this pipeline will only be accepted if all pipeline tests pass. To check:
+
+1. Make your changes.
+
+2. Download the test data. A utility script is provided:
+
+   ```
+   python3 scripts/download_test_data.py
+   ```
+
+3. Install [`nf-test`](https://code.askimed.com/nf-test/installation/) (>=0.7.0) and run the tests:
+
+   ```
+   nf-test test tests/*.nf.test
+   ```
+
+   If running on Sanger HPC cluster, add the option `--profile sanger_local`.
+
+4. Submit a PR.
 
 ## Credits
 

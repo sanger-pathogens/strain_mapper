@@ -1,0 +1,30 @@
+nextflow_process {
+
+    name "Test Process CURATE"
+    script "modules/curate.nf"
+    process "CURATE"
+
+    test("Should run without failures") {
+
+        when {
+            params {
+                max_cpus   = "1"
+                max_memory = "2.GB"
+                max_time   = "1.h"
+                outdir = "${outputDir}"
+            }
+            process {
+                """
+                input[0] = [["id": "12483_8#10"], file("test_data/inputs/bcftools_call/12483_8#10.vcf"), file("test_data/inputs/ref/GCF_000011265.1.fna"), file("test_data/inputs/ref/GCF_000011265.1.fna.fai")]
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert snapshot(process.out.curated).match()
+        }
+
+    }
+
+}

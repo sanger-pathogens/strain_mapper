@@ -1,0 +1,43 @@
+def testData = new File("test_data")
+def inputs = new File(testData, "inputs")
+
+def verifyOutputs = { outputDir ->
+    def expectedDir = new File(inputs, "bcftools_call")
+    def actualDir = new File(outputDir, "bcftools_call")
+
+    println "\nPipeline run complete\nComparing `${expectedDir}` and `${actualDir}`..."
+
+    assert Compare.dirsConform(expectedDir, actualDir, BcftoolsCallCompare.&compare) :
+        "The pipeline output didn't match the expected output (generated in a previous pipeline run). See stderr for a more verbose report"
+}
+
+nextflow_process {
+
+    name "Test Process BCFTOOLS_CALL"
+    script "modules/bcftools.nf"
+    process "BCFTOOLS_CALL"
+
+    test("Should run without failures") {
+
+        when {
+            params {
+                max_cpus   = "1"
+                max_memory = "2.GB"
+                max_time   = "1.h"
+                outdir = "${outputDir}"
+            }
+            process {
+                """
+                input[0] = [["id": "12483_8#10"], file("test_data/inputs/bcftools_mpileup/12483_8#10.mpileup")]
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            verifyOutputs(outputDir)
+        }
+
+    }
+
+}
