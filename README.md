@@ -57,7 +57,7 @@ All relevant intermediate files are currently published in process-specific dire
 
 ## Generating a manifest
 
-Manifests supplied as an argument to `--input`, should be of of the following format:
+Manifests supplied as an argument to `--input` should be of of the following format:
 
 ```console
 ID,R1,R2
@@ -68,11 +68,12 @@ Where column `ID` can be an arbitrary sample identifier, `R1` is a .fastq.gz fil
 
 Scripts have been developed to generate manifests appropriate for this pipeline:
 
-- To generate a manifest from a file of lane identifiers visible to `pf`, use [this script](https://gitlab.internal.sanger.ac.uk/sanger-pathogens/pipelines/metawrap_qc/-/blob/main/generate_manifest_from_lanes.sh).
+- To generate a manifest from a file of lane identifiers visible to `pf`, use [this script](./scripts/generate_strain_mapper_manifest_from_lanes.sh).
 
-- To generate a manifest from a file of custom .fastq.gz paths, use [this script](https://gitlab.internal.sanger.ac.uk/sanger-pathogens/pipelines/metawrap_qc/-/blob/main/generate_manifest.sh).
+- To generate a manifest from a file of custom .fastq.gz paths, use [this script](./scripts/generate_strain_mapper_manifest.sh).
 
-Please run `--help` on these scripts or see [this README](https://gitlab.internal.sanger.ac.uk/sanger-pathogens/pipelines/metawrap_qc#generating-manifests) for information on script usage.
+Please run `--help` on these scripts for more information on script usage.
+
 
 ## Usage
 
