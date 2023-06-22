@@ -123,7 +123,6 @@ workflow {
     if (bt2_index_files) {
         Channel.fromPath(bt2_index_files)
             .collect()
-            .map { bt2_index_files -> tuple(ref_without_extension, bt2_index_files) }
             .dump(tag: 'bt2_index')
             .set { ch_bt2_index }
     } else {
