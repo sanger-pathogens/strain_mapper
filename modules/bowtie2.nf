@@ -1,5 +1,5 @@
 process BOWTIE2 {
-    label 'process_medium'
+    label 'cpu_4_mem_8_time_12'
     publishDir "${params.outdir}/bowtie2", mode: 'copy', overwrite: true
 
     container 'quay.io/biocontainers/bowtie2:2.5.1--py310h8d7afc0_0'
@@ -25,7 +25,7 @@ process BOWTIE2 {
 }
 
 process BOWTIE2_INDEX {
-    label 'process_medium'
+    label 'cpu_4_mem_8_time_12'
     publishDir "${params.outdir}/bowtie2", mode: 'copy', overwrite: true
 
     container 'quay.io/biocontainers/bowtie2:2.5.1--py310h8d7afc0_0'
