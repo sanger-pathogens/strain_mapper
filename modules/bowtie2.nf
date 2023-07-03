@@ -34,7 +34,7 @@ process BOWTIE2_INDEX {
     path(reference)
 
     output:
-    tuple path("${reference.baseName}*.bt2"),  emit: bt2_index
+    path("${reference.baseName}*.bt2"),  emit: bt2_index
 
     script:
     ref_basename = "${reference.baseName}"
