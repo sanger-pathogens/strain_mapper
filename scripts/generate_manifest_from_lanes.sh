@@ -5,12 +5,12 @@ module load pf
 usage() {
   cat <<EOT
 Usage: $(basename $0) <OPTION>...
-       Generates manifest for metawrap_qc nextflow pipeline using data stored centrally in the PaM informatics legacy pipelines
+       Generates manifest for strain-mapper nextflow pipeline using data stored centrally in the PaM informatics legacy pipelines
 
        -l,
-       Lanes file - file containing list of lanes to be ran through the metawrap_qc pipeline (mandatory)
+       Lanes file - file containing list of lanes to be ran through the strain-mapper pipeline (mandatory)
        -m,
-       Manifest file - name of the manifest file generated to be used in the metawrap_qc pipeline - default: manifest.csv (optional)
+       Manifest file - name of the manifest file generated to be used in the strain-mapper pipeline - default: manifest.csv (optional)
        -h,
        Print this help message and exit the program
 
@@ -55,7 +55,7 @@ if  [ ! ${manifest_file} ]; then
     manifest_file="manifest.csv"
 fi
 
-echo "sample_id,first_read,second_read" > ${manifest_file}
+echo "ID,R1,R2" > ${manifest_file}
 
 pf data -t file -i ${lanes_file} -f fastq | sort 2>/dev/null |  xargs -n1 echo > Temp_file_path.txt
 
