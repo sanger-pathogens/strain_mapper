@@ -1,5 +1,5 @@
 process CONVERT_TO_BAM {
-    label 'process_low'
+    label 'cpu_2_mem_1_time_1'
     publishDir "${params.outdir}/samtools_view", mode: 'copy', overwrite: true
 
     container 'quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2'
@@ -21,7 +21,7 @@ process CONVERT_TO_BAM {
 }
 
 process SAMTOOLS_SORT {
-    label 'process_medium'
+    label 'cpu_4_mem_8_time_12'
     publishDir "${params.outdir}/samtools_sort", mode: 'copy', overwrite: true
 
     container 'quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2'
@@ -42,7 +42,7 @@ process SAMTOOLS_SORT {
 }
 
 process INDEX_REF {
-    label 'process_low'
+    label 'cpu_2_mem_1_time_1'
     publishDir "${params.outdir}/sorted_ref", mode: 'copy', overwrite: true
 
     container 'quay.io/biocontainers/samtools:1.16.1--h00cdaf9_2'
