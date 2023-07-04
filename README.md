@@ -68,9 +68,9 @@ Where column `ID` can be an arbitrary sample identifier, `R1` is a .fastq.gz fil
 
 Scripts have been developed to generate manifests appropriate for this pipeline:
 
-- To generate a manifest from a file of lane identifiers visible to `pf`, use [this script](./scripts/generate_strain_mapper_manifest_from_lanes.sh).
+- To generate a manifest from a file of lane identifiers visible to `pf`, use [this script](./scripts/generate_manifest_from_lanes.sh).
 
-- To generate a manifest from a file of custom .fastq.gz paths, use [this script](./scripts/generate_strain_mapper_manifest.sh).
+- To generate a manifest from a file of custom .fastq.gz paths, use [this script](./scripts/generate_manifest.sh).
 
 Please run `--help` on these scripts for more information on script usage.
 
