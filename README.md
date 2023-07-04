@@ -34,17 +34,16 @@ All relevant intermediate files are currently published in process-specific dire
    ```
 
 3. Start the pipeline  
-   For example input, please see [Generating a manifest](#generating-a-manifest).  
-   Note: To use the appropriate Sanger configuration, please run with `-profile sanger_lsf` option.
+   For example input, please see [Generating a manifest](#generating-a-manifest).
 
    Example:
    ```bash
-   nextflow run . -profile sanger_lsf --input ./test_data/inputs/test_manifest.csv --reference ./test_data/ref/test_ref.fna --outdir my_output
+   nextflow run . --input ./test_data/inputs/test_manifest.csv --reference ./test_data/ref/test_ref.fna --outdir my_output
    ```
 
    It is good practice to submit a dedicated job for the nextflow master process (use the `oversubscribed` queue):
    ```bash
-   bsub -o output.o -e error.e -q oversubscribed -R "select[mem>4000] rusage[mem=4000]" -M4000 nextflow run . -profile sanger_lsf --input ./test_data/inputs/test_manifest.csv --reference ./test_data/ref/test_ref.fna --outdir my_output
+   bsub -o output.o -e error.e -q oversubscribed -R "select[mem>4000] rusage[mem=4000]" -M4000 nextflow run . --input ./test_data/inputs/test_manifest.csv --reference ./test_data/ref/test_ref.fna --outdir my_output
    ```
 
    See [usage](#usage) for all available pipeline options.
@@ -57,7 +56,7 @@ All relevant intermediate files are currently published in process-specific dire
 
 ## Generating a manifest
 
-Manifests supplied as an argument to `--input`, should be of of the following format:
+Manifests supplied as an argument to `--input` should be of of the following format:
 
 ```console
 ID,R1,R2
@@ -68,11 +67,12 @@ Where column `ID` can be an arbitrary sample identifier, `R1` is a .fastq.gz fil
 
 Scripts have been developed to generate manifests appropriate for this pipeline:
 
-- To generate a manifest from a file of lane identifiers visible to `pf`, use [this script](https://gitlab.internal.sanger.ac.uk/sanger-pathogens/pipelines/metawrap_qc/-/blob/main/generate_manifest_from_lanes.sh).
+- To generate a manifest from a file of lane identifiers visible to `pf`, use [this script](./scripts/generate_manifest_from_lanes.sh).
 
-- To generate a manifest from a file of custom .fastq.gz paths, use [this script](https://gitlab.internal.sanger.ac.uk/sanger-pathogens/pipelines/metawrap_qc/-/blob/main/generate_manifest.sh).
+- To generate a manifest from a file of custom .fastq.gz paths, use [this script](./scripts/generate_manifest.sh).
 
-Please run `--help` on these scripts or see [this README](https://gitlab.internal.sanger.ac.uk/sanger-pathogens/pipelines/metawrap_qc#generating-manifests) for information on script usage.
+Please run `--help` on these scripts for more information on script usage.
+
 
 ## Usage
 
