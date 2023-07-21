@@ -1,5 +1,8 @@
 process CURATE {
-    label 'cpu_2_mem_1_time_1'
+    label 'cpu_2'
+    label 'mem_1'
+    label 'time_1'
+
     publishDir "${params.outdir}/final_mapping", mode: 'copy', overwrite: true
 
     container 'quay.io/biocontainers/python:3.10.2'
