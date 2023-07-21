@@ -1,4 +1,3 @@
-//TODO: This was originally SAMTOOLS_MPILEUP, but this didn't seem to be compatible with subsequent bcftools call
 process BCFTOOLS_MPILEUP {
     label 'cpu_2'
     label 'mem_1'

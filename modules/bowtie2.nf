@@ -16,7 +16,6 @@ process BOWTIE2 {
 
     script:
     mapped_reads = "${meta.id}.sam"
-    //TODO: Original code used `-U ${reads[2]}` option to also map unpaired reads - could include in manifest and validate NA values if unpaired file doesn't exist
     """
     # glob pattern to ensure correct bt index name
     bt_index=\$(ls *.bt2* | head -1 | awk -F ".1.bt2" '{ print \$1 }')
