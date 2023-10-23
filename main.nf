@@ -85,7 +85,7 @@ validate_parameters()
 //
 include { BOWTIE2; BOWTIE2_INDEX } from './modules/bowtie2'
 include { CONVERT_TO_BAM; SAMTOOLS_SORT; INDEX_REF } from './modules/samtools'
-include { BCFTOOLS_CALL; BCFTOOLS_MPILEUP } from './modules/bcftools'
+include { BCFTOOLS_CALL; BCFTOOLS_MPILEUP; BCFTOOLS_FILTERING } from './modules/bcftools'
 include { CURATE } from './modules/curate'
 
 //
@@ -180,7 +180,13 @@ workflow {
     )
     BCFTOOLS_CALL.out.vcf_final.dump(tag: 'vcf_final').set { ch_vcf_final }
 
-    ch_vcf_final
+    BCFTOOLS_FILTERING(
+        ch_vcf_final
+    )
+    BCFTOOLS_FILTERING.out.filtered_vcf_final.dump(tag: 'vcf_final').set { ch_filtered_vcf_final }
+
+
+    ch_filtered_vcf_final
         .combine(ch_ref_index)
         .dump(tag: 'vcf_and_ref')
         .set { ch_vcf_and_ref }
