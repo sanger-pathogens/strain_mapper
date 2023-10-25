@@ -180,11 +180,14 @@ workflow {
     )
     BCFTOOLS_CALL.out.vcf_final.dump(tag: 'vcf_final').set { ch_vcf_final }
 
-    BCFTOOLS_FILTERING(
-        ch_vcf_final
-    )
-    BCFTOOLS_FILTERING.out.filtered_vcf_final.dump(tag: 'vcf_final').set { ch_filtered_vcf_final }
-
+    if (params.skip_filtering) { 
+        ch_vcf_final.set{ ch_filtered_vcf_final }
+    } else {
+        BCFTOOLS_FILTERING(
+            ch_vcf_final
+        )
+        BCFTOOLS_FILTERING.out.filtered_vcf_final.dump(tag: 'vcf_final').set { ch_filtered_vcf_final }
+    }
 
     ch_filtered_vcf_final
         .combine(ch_ref_index)
