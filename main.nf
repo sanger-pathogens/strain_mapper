@@ -14,6 +14,9 @@ def printHelp() {
         --input                      Manifest containing per-sample paths to .fastq.gz files (mandatory)
         --reference                  Reference to map reads against (mandatory)
         --outdir                     Specify output directory [default: ./results] (optional)
+        --keep_ref_variants          When included this flag reports reference variants in the vcf increasing time for BCFTOOLS call if used please alter default filters or skip filtering to not remove these default = null (optional)
+        --VCF_filters                Default filtering removing records below 50 quality score and also requiring 3 reads from each strand with overall greater than 8. default = "QUAL>=50 & MIN(DP)>=8 & DP4[2]>3 & DP4[3]>3" (optional)
+        --skip_filtering             Entirely skip filtering of the BCFTOOLS call vcf default = false
         --help                       Print this help message (optional)
     """.stripIndent()
 }

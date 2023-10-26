@@ -40,13 +40,23 @@ process BCFTOOLS_CALL {
 
     script:
     vcf_final = "${meta.id}.vcf"
-    """
-    bcftools call -o ${vcf_final} \
-                  -O 'v' \
-                  -V indels \
-                  -m \
-                  '${mpileup_file}'
-    """
+    if ( params.keep_ref_variants == true )
+        """
+        bcftools call -o ${vcf_final} \
+            -O 'v' \
+            -V indels \
+            -m \
+            '${mpileup_file}'
+        """
+    else
+        """
+        bcftools call -o ${vcf_final} \
+            -O 'v' \
+            -V indels \
+            -m \
+            -v \
+            '${mpileup_file}'
+        """
 }
 
 process BCFTOOLS_FILTERING {
