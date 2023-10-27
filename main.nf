@@ -14,7 +14,7 @@ def printHelp() {
         --input                      Manifest containing per-sample paths to .fastq.gz files (mandatory)
         --reference                  Reference to map reads against (mandatory)
         --outdir                     Specify output directory [default: ./results] (optional)
-        --only_report_alts           When included this flag reports only ALT varients in the vcf decreasing time for BCFTOOLS call default = null (optional)
+        --only_report_alts           When included this flag reports only ALT variants in the VCF output. default = null (optional)
         --VCF_filters                Default filtering removing records below 50 quality score and also requiring 3 reads from each strand with overall greater than 8. default = "QUAL>=50 & MIN(DP)>=8 & DP4[2]>3 & DP4[3]>3" (optional)
         --skip_filtering             Do not generate a filtered output of the BCFTOOLS call vcf  default = false
         --help                       Print this help message (optional)
