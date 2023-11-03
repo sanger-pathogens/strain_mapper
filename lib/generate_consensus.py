@@ -6,7 +6,7 @@ import logging
 from pathlib import Path
 from typing import TextIO
 
-defaultseqchar = 'N'
+DEFAULTSEQCHAR = 'N'
 
 def get_chrom_id_and_size(ref_index: Path):
     with open(ref_index, "r") as f:
