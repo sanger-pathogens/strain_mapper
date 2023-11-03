@@ -15,7 +15,7 @@ def get_chrom_id_and_size(ref_index: Path):
 
 
 def initialise_seq(chrom_size: int):
-    return [defaultseqchar] * chrom_size
+    return [DEFAULTSEQCHAR] * chrom_size
 
 
 def parse_lines(fh: TextIO):
