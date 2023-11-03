@@ -6,6 +6,7 @@ import logging
 from pathlib import Path
 from typing import TextIO
 
+defaultseqchar = 'N'
 
 def get_chrom_id_and_size(ref_index: Path):
     with open(ref_index, "r") as f:
@@ -14,7 +15,7 @@ def get_chrom_id_and_size(ref_index: Path):
 
 
 def initialise_seq(chrom_size: int):
-    return ["-"] * chrom_size
+    return [defaultseqchar] * chrom_size
 
 
 def parse_lines(fh: TextIO):
@@ -62,7 +63,7 @@ def is_acceptable_quality(qual: float, pos: int, threshold: int=10, alt_quality:
 def get_nt_to_add(ref: str, alt: str):
     if len(alt) > 1:
         # if mutiple bases called at a position
-        return "-"
+        return defaultseqchar
     if alt == ".":
         # if the mapped strain is the same as the query, then it is reported as a '.'
         return ref
@@ -74,7 +75,7 @@ def get_seq(
     vcf: Path, ref_index: Path, qual_threshold: float=10
 ):
     chrom_id, chrom_size = get_chrom_id_and_size(ref_index)
-    seq = ['-'] * chrom_size
+    seq = initialise_seq(chrom_size)
     with open(vcf, "r", newline="") as f:
         parsed_lines = parse_lines(f)
         for line in parsed_lines:
@@ -99,7 +100,7 @@ def get_seq(
 def write_seq(seq: str, seq_id: str, output_fasta: str="out.fa"):
     with open(output_fasta, "w") as f:
         seq_header = f">{seq_id}"
-        f.write("\n".join([seq_header, seq]))
+        f.write("{seq_header}\n{seq}\n")
 
 
 def parse_args():
