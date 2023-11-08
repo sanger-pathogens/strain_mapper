@@ -28,6 +28,9 @@ process BCFTOOLS_CALL {
     label 'mem_1'
     label 'time_1'
 
+    // should only publish this raw VCF as an option
+    // publishDir "${params.outdir}/bcftools_call", mode: 'copy', overwrite: true
+
     container 'quay.io/biocontainers/bcftools:1.16--haef29d1_2'
 
     input:
@@ -39,7 +42,7 @@ process BCFTOOLS_CALL {
     script:
     vcf_allpos = "${meta.id}.vcf"
     """
-    bcftools call -o ${vcf_final} \
+    bcftools call -o ${vcf_allpos} \
         -O 'v' \
         -V indels \
         -m \
@@ -52,22 +55,57 @@ process BCFTOOLS_FILTERING {
     label 'mem_1'
     label 'time_1'
 
-    publishDir "${params.outdir}/bcftools_filter", mode: 'copy', overwrite: true
+    // should only publish this filtered VCF as an option
+    // publishDir "${params.outdir}/bcftools_filter", mode: 'copy', overwrite: true
 
     container 'quay.io/biocontainers/bcftools:1.16--haef29d1_2'
 
     input:
-    tuple val(meta), file(vcf_final)
+    tuple val(meta), file(vcf_allpos)
 
     output:
-    tuple val(meta), path("${filtered_vcf_final}"),  emit: filtered_vcf_final
+    tuple val(meta), path("${filtered_vcf_allpos}"),  emit: filtered_vcf_allpos
+
+    script:
+    filtered_vcf_allpos = "${meta.id}_filtered.vcf"
+    """
+    bcftools view -o ${filtered_vcf_allpos} \
+                  -O 'v' \
+                  -i '${params.VCF_filters}' \
+                  '${vcf_allpos}'
+    """
+}
+
+process FINAL_VCF {
+    label 'cpu_2'
+    label 'mem_1'
+    label 'time_1'
+    
+    publishDir "${params.outdir}/final_vcf", mode: 'copy', overwrite: true
+
+    container 'quay.io/biocontainers/bcftools:1.16--haef29d1_2'
+
+    input:
+    tuple val(meta), file(filtered_vcf_allpos)
+
+    output:
+    tuple val(meta), path("${filtered_vcf_refonly}"),  emit: filtered_vcf_refonly
 
     script:
     filtered_vcf_final = "${meta.id}_filtered.vcf"
-    """
-    bcftools view -o ${filtered_vcf_final} \
-                  -O 'v' \
-                  -i '${params.VCF_filters}' \
-                  '${vcf_final}'
-    """
+    if ( params.only_report_alts == true )
+        """
+        bcftools view -o ${filtered_vcf_refonly} \
+            -O 'v' \
+            -V ref \
+            '${filtered_vcf_allpos}'
+        """
+    else
+        """
+        cat ${filtered_vcf_allpos} \
+            > '${filtered_vcf_refonly}'
+        """
+}
+
+
 }
