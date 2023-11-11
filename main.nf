@@ -88,8 +88,8 @@ validate_parameters()
 //
 include { BOWTIE2; BOWTIE2_INDEX } from './modules/bowtie2'
 include { CONVERT_TO_BAM; SAMTOOLS_SORT; INDEX_REF } from './modules/samtools'
-include { BCFTOOLS_CALL; BCFTOOLS_MPILEUP; BCFTOOLS_FILTERING } from './modules/bcftools'
-include { CURATE } from './modules/curate'
+include { BCFTOOLS_CALL; BCFTOOLS_MPILEUP; FINAL_VCF } from './modules/bcftools'
+include { CURATE_CONSENSUS } from './modules/curate'
 
 //
 // SUBWORKFLOWS
@@ -187,17 +187,19 @@ workflow {
         BCFTOOLS_FILTERING(
             ch_vcf_final
         )
-}
+    }
+
+    FINAL_VCF(ch_vcf_final)
 
     ch_vcf_final
         .combine(ch_ref_index)
         .dump(tag: 'vcf_and_ref')
         .set { ch_vcf_and_ref }
 
-    CURATE(
+    CURATE_CONSENSUS(
         ch_vcf_and_ref
     )
-    CURATE.out.curated.dump(tag: 'curated').set { ch_curated }
+    CURATE_CONSENSUS.out.curated.dump(tag: 'curated_consensus').set { ch_curated }
 }
 
 /*

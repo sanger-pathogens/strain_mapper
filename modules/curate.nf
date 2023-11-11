@@ -1,4 +1,4 @@
-process CURATE {
+process CURATE_CONSENSUS {
     label 'cpu_2'
     label 'mem_1'
     label 'time_1'
@@ -11,7 +11,7 @@ process CURATE {
     tuple val(meta), file(vcf_final), path(reference), path(ref_index)
 
     output:
-    tuple val(meta), path("*.fa"),  emit: curated
+    tuple val(meta), path("*.fa"),  emit: curated_consensus
 
     script:
     ref_basename = reference.baseName
