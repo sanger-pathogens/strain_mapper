@@ -28,9 +28,6 @@ process BCFTOOLS_CALL {
     label 'mem_1'
     label 'time_1'
 
-    // optionally publish unfiltered VCF with all positions
-    if (keep_raw_vcf == true) publishDir "${params.outdir}/bcftools_call", mode: 'copy', overwrite: true
-
     container 'quay.io/biocontainers/bcftools:1.16--haef29d1_2'
 
     input:
@@ -72,13 +69,44 @@ process BCFTOOLS_FILTERING {
                   '${vcf_allpos}'
     """
 }
+process RAW_VCF {
+    label 'cpu_2'
+    label 'mem_1'
+    label 'time_1'
+    
+    publishDir "${params.outdir}/final_vcf", mode: 'copy', overwrite: true
+
+    container 'quay.io/biocontainers/bcftools:1.16--haef29d1_2'
+
+    input:
+    tuple val(meta), file(bcf_allpos)
+
+    output:
+    tuple val(meta), path("${out_vcf}"),  emit: out_vcf
+
+    script:
+    out_vcf = "${meta.id}.vcf"
+    if ( params.only_report_alts == true )
+        """
+        bcftools view -o ${out_vcf} \
+            -O 'z' \
+            -V ref \
+            '${bcf_allpos}'
+        """
+    else
+        """
+        bcftools view -o ${out_vcf} \
+            -O 'z' \
+            '${bcf_allpos}'
+        """
+}
 
 process FINAL_VCF {
     label 'cpu_2'
     label 'mem_1'
     label 'time_1'
     
-    publishDir "${params.outdir}/final_vcf", mode: 'copy', overwrite: true
+    publishDir "${params.outdir}/raw_vcf", mode: 'copy', overwrite: true
 
     container 'quay.io/biocontainers/bcftools:1.16--haef29d1_2'
 
@@ -93,13 +121,14 @@ process FINAL_VCF {
     if ( params.only_report_alts == true )
         """
         bcftools view -o ${out_vcf} \
-            -O 'v' \
+            -O 'z' \
             -V ref \
             '${vcf_allpos}'
         """
     else
         """
-        cat ${vcf_allpos} \
-            > '${out_vcf}'
+        bcftools view -o ${out_vcf} \
+            -O 'z' \
+            '${vcf_allpos}'
         """
 }

@@ -183,6 +183,12 @@ workflow {
     )
     BCFTOOLS_CALL.out.vcf_final.dump(tag: 'vcf_final').set { ch_vcf_final }
 
+    if (keep_raw_vcf == true){
+        RAW_VCF(
+            ch_vcf_final
+        )
+    }
+
     if (!params.skip_filtering) {
         BCFTOOLS_FILTERING(
             ch_vcf_final
