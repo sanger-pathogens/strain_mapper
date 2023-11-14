@@ -212,7 +212,7 @@ workflow {
     CURATE_CONSENSUS(
         ch_vcf_and_ref
     )
-    CURATE_CONSENSUS.out.curated.dump(tag: 'curated_consensus').set { ch_curated }
+    CURATE_CONSENSUS.out.curated_consensus.dump(tag: 'curated_consensus').set { ch_curated }
 }
 
 /*
