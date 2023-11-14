@@ -93,7 +93,7 @@ validate_parameters()
 //
 include { BOWTIE2; BOWTIE2_INDEX } from './modules/bowtie2'
 include { CONVERT_TO_BAM; SAMTOOLS_SORT; INDEX_REF } from './modules/samtools'
-include { BCFTOOLS_CALL; BCFTOOLS_MPILEUP; FINAL_VCF; RAW_VCF } from './modules/bcftools'
+include { BCFTOOLS_CALL; BCFTOOLS_MPILEUP; BCFTOOLS_FILTERING; FINAL_VCF; RAW_VCF } from './modules/bcftools'
 include { CURATE_CONSENSUS } from './modules/curate'
 
 //
