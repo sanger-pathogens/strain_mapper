@@ -181,23 +181,25 @@ workflow {
     BCFTOOLS_CALL(
         ch_mpileup_file
     )
-    BCFTOOLS_CALL.out.vcf_final.dump(tag: 'vcf_final').set { ch_vcf_final }
+    BCFTOOLS_CALL.out.vcf_allpos.dump(tag: 'vcf_allpos').set { ch_vcf_allpos }
 
     if (keep_raw_vcf == true){
         RAW_VCF(
-            ch_vcf_final
+            ch_vcf_allpos
         )
     }
 
     if (!params.skip_filtering) {
         BCFTOOLS_FILTERING(
-            ch_vcf_final
+            ch_vcf_allpos
         )
     }
 
-    FINAL_VCF(ch_vcf_final)
+    FINAL_VCF(
+        ch_vcf_allpos
+    )
 
-    ch_vcf_final
+    ch_vcf_allpos
         .combine(ch_ref_index)
         .dump(tag: 'vcf_and_ref')
         .set { ch_vcf_and_ref }
