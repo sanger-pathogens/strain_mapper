@@ -14,9 +14,14 @@ def printHelp() {
         --input                      Manifest containing per-sample paths to .fastq.gz files (mandatory)
         --reference                  Reference to map reads against (mandatory)
         --outdir                     Specify output directory [default: ./results] (optional)
-        --only_report_alts           When included this flag reports only ALT variants in the VCF output. default = null (optional)
-        --VCF_filters                Default filtering removing records below 50 quality score and also requiring 3 reads from each strand with overall greater than 8. default = "QUAL>=50 & MIN(DP)>=8 & DP4[2]>3 & DP4[3]>3" (optional)
-        --skip_filtering             Do not generate a filtered output of the BCFTOOLS call vcf  default = false
+        --only_report_alts           When included this flag reports only ALT variants in the VCF output. default = true (optional)
+        --VCF_filters                Parameters for filtering variants in VCF file. Default is to removing records below 50 quality score 
+                                      and also requiring 3 reads from each strand with overall greater than 8. 
+                                      default = "QUAL>=50 & MIN(DP)>=8 & DP4[2]>3 & DP4[3]>3" (optional)
+        --skip_filtering             Do not filter variants called using `bcftools call` based on metrics defined with --VCF_filters.  default = false
+        --keep_raw_vcf               Also publish the unfiltered VCF file i.e. direct output of `bcftools call`; can be combined with 
+                                      --only_report_alts=false to report all (unfiltered, REF and ALT) variants; 
+                                      only relevant when --skip_filtering=false; default = false
         --help                       Print this help message (optional)
     """.stripIndent()
 }
@@ -88,7 +93,7 @@ validate_parameters()
 //
 include { BOWTIE2; BOWTIE2_INDEX } from './modules/bowtie2'
 include { CONVERT_TO_BAM; SAMTOOLS_SORT; INDEX_REF } from './modules/samtools'
-include { BCFTOOLS_CALL; BCFTOOLS_MPILEUP; FINAL_VCF } from './modules/bcftools'
+include { BCFTOOLS_CALL; BCFTOOLS_MPILEUP; FINAL_VCF; RAW_VCF } from './modules/bcftools'
 include { CURATE_CONSENSUS } from './modules/curate'
 
 //
@@ -183,7 +188,7 @@ workflow {
     )
     BCFTOOLS_CALL.out.vcf_allpos.dump(tag: 'vcf_allpos').set { ch_vcf_allpos }
 
-    if (keep_raw_vcf == true){
+    if (params.keep_raw_vcf){
         RAW_VCF(
             ch_vcf_allpos
         )
