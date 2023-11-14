@@ -188,7 +188,7 @@ workflow {
     )
     BCFTOOLS_CALL.out.vcf_allpos.dump(tag: 'vcf_allpos').set { ch_vcf_allpos }
 
-    if (params.keep_raw_vcf){
+    if (params.keep_raw_vcf && !params.skip_filtering){
         RAW_VCF(
             ch_vcf_allpos
         )
