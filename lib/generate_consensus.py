@@ -100,7 +100,7 @@ def get_seq(
 def write_seq(seq: str, seq_id: str, output_fasta: str="out.fa"):
     with open(output_fasta, "w") as f:
         seq_header = f">{seq_id}"
-        f.write("{seq_header}\n{seq}\n")
+        f.write(f"{seq_header}\n{seq}\n")
 
 
 def parse_args():
