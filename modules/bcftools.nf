@@ -38,13 +38,22 @@ process BCFTOOLS_CALL {
 
     script:
     vcf_allpos = "${meta.id}.bcf"
-    """
-    bcftools call -o ${vcf_allpos} \
-        -O 'u' \
-        -V indels \
-        -m \
-        '${mpileup_file}'
-    """
+    if (!params.skip_filtering)
+        """
+        bcftools call -o ${vcf_allpos} \
+            -O 'u' \
+            -V indels \
+            -m \
+            '${mpileup_file}'
+        """
+    else
+        """
+        bcftools call -o ${vcf_allpos} \
+            -O 'v' \
+            -V indels \
+            -m \
+            '${mpileup_file}'
+        """
 }
 
 process BCFTOOLS_FILTERING {
@@ -86,7 +95,7 @@ process RAW_VCF {
 
     script:
     out_vcf = "${meta.id}.vcf"
-    if ( params.only_report_alts == true )
+    if (params.only_report_alts)
         """
         bcftools view -o ${out_vcf} \
             -O 'z' \
