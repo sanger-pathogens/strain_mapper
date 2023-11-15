@@ -199,15 +199,14 @@ workflow {
             ch_vcf_allpos
         )
         BCFTOOLS_FILTERING.out.set { ch_vcf_final }
-        FINAL_VCF(
-            ch_vcf_final
-        )
     }else{
-        FINAL_VCF(
-            ch_vcf_allpos
-        )
-        ch_vcf_final = ch_vcf_allpos
+        ch_vcf_allpos.set { ch_vcf_final }
     }
+
+    FINAL_VCF(
+        ch_vcf_final
+    )
+    
     ch_vcf_final
         .combine(ch_ref_index)
         .dump(tag: 'vcf_and_ref')
