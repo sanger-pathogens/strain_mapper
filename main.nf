@@ -14,6 +14,14 @@ def printHelp() {
         --input                      Manifest containing per-sample paths to .fastq.gz files (mandatory)
         --reference                  Reference to map reads against (mandatory)
         --outdir                     Specify output directory [default: ./results] (optional)
+        --only_report_alts           When included this flag reports only ALT variants in the VCF output. default = true (optional)
+        --VCF_filters                Parameters for filtering variants in VCF file. Default is to removing records below 50 quality score 
+                                      and also requiring 3 reads from each strand with overall greater than 8. 
+                                      default = "QUAL>=50 & MIN(DP)>=8 & ((ALT!="." & DP4[2]>3 & DP4[3]>3) | (ALT="." & DP4[0]>3 & DP4[1]>3))" (optional)
+        --skip_filtering             Do not filter variants called using `bcftools call` based on metrics defined with --VCF_filters.  default = false
+        --keep_raw_vcf               Also publish the unfiltered VCF file i.e. direct output of `bcftools call`; can be combined with 
+                                      --only_report_alts=false to report all (unfiltered, REF and ALT) variants; 
+                                      only relevant when --skip_filtering=false; default = false
         --help                       Print this help message (optional)
     """.stripIndent()
 }
@@ -85,8 +93,8 @@ validate_parameters()
 //
 include { BOWTIE2; BOWTIE2_INDEX } from './modules/bowtie2'
 include { CONVERT_TO_BAM; SAMTOOLS_SORT; INDEX_REF } from './modules/samtools'
-include { BCFTOOLS_CALL; BCFTOOLS_MPILEUP } from './modules/bcftools'
-include { CURATE } from './modules/curate'
+include { BCFTOOLS_CALL; BCFTOOLS_MPILEUP; BCFTOOLS_FILTERING; FINAL_VCF; RAW_VCF } from './modules/bcftools'
+include { CURATE_CONSENSUS } from './modules/curate'
 
 //
 // SUBWORKFLOWS
@@ -178,17 +186,36 @@ workflow {
     BCFTOOLS_CALL(
         ch_mpileup_file
     )
-    BCFTOOLS_CALL.out.vcf_final.dump(tag: 'vcf_final').set { ch_vcf_final }
+    BCFTOOLS_CALL.out.vcf_allpos.dump(tag: 'vcf_allpos').set { ch_vcf_allpos }
 
+    if (params.keep_raw_vcf && !params.skip_filtering){
+        RAW_VCF(
+            ch_vcf_allpos
+        )
+    }
+
+    if (!params.skip_filtering) {
+        BCFTOOLS_FILTERING(
+            ch_vcf_allpos
+        )
+        BCFTOOLS_FILTERING.out.set { ch_vcf_final }
+    }else{
+        ch_vcf_allpos.set { ch_vcf_final }
+    }
+
+    FINAL_VCF(
+        ch_vcf_final
+    )
+    
     ch_vcf_final
         .combine(ch_ref_index)
         .dump(tag: 'vcf_and_ref')
         .set { ch_vcf_and_ref }
 
-    CURATE(
+    CURATE_CONSENSUS(
         ch_vcf_and_ref
     )
-    CURATE.out.curated.dump(tag: 'curated').set { ch_curated }
+    CURATE_CONSENSUS.out.curated_consensus.dump(tag: 'curated_consensus').set { ch_curated }
 }
 
 /*

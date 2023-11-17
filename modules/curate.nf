@@ -1,9 +1,9 @@
-process CURATE {
+process CURATE_CONSENSUS {
     label 'cpu_2'
     label 'mem_1'
     label 'time_1'
 
-    publishDir "${params.outdir}/final_mapping", mode: 'copy', overwrite: true
+    publishDir "${params.outdir}/curated_consensus", mode: 'copy', overwrite: true
 
     container 'quay.io/biocontainers/python:3.10.2'
 
@@ -11,7 +11,7 @@ process CURATE {
     tuple val(meta), file(vcf_final), path(reference), path(ref_index)
 
     output:
-    tuple val(meta), path("*.fa"),  emit: curated
+    tuple val(meta), path("*.fa"),  emit: curated_consensus
 
     script:
     ref_basename = reference.baseName

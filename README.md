@@ -83,8 +83,19 @@ Options:
    --input                      Manifest containing per-sample paths to .fastq.gz files (mandatory)
    --reference                  Reference to map reads against (mandatory)
    --outdir                     Specify output directory [default: ./results] (optional)
+   --keep_ref_variants          When included this flag reports reference variants in the vcf increasing time for BCFTOOLS call if used please alter default filters or skip filtering to not remove these default = null (optional)
+   --VCF_filters                Default filtering removing records below 50 quality score and also requiring 3 reads from each strand  with overall greater than 8. default = "QUAL>=50 & MIN(DP)>=8 & DP4[2]>3 & DP4[3]>3" (optional)
+   --skip_filtering             Entirely skip filtering of the BCFTOOLS call vcf default = false
    --help                       Print this help message (optional)
 ```
+## Default filtering
+
+By default filtering removes records below 50 quality score and ensures that they are represented on at least 3 forward and reverse reads. In addition there must be more than 8 reads in total supporting this variant call.
+
+To edit these please follow the documentation as seen on the BCFTOOLS view page under expressions:
+
+https://samtools.github.io/bcftools/bcftools.html#expressions
+
 ## Contributions and testing
 
 Developer contributions to this pipeline will only be accepted if all pipeline tests pass. To check:
