@@ -100,7 +100,7 @@ process RAW_VCF {
         """
         bcftools view -o ${out_vcf} \
             -O 'z' \
-            -V ref \
+            -i 'GT="alt"' \
             '${bcf_allpos}'
         """
     else
@@ -129,11 +129,11 @@ process FINAL_VCF {
 
     script:
     out_vcf = "${meta.id}.vcf.gz"
-    if ( params.only_report_alts == true )
+    if (params.only_report_alts)
         """
         bcftools view -o ${out_vcf} \
             -O 'z' \
-            -V ref \
+            -i 'GT="alt"' \
             '${vcf_allpos}'
         """
     else
