@@ -83,10 +83,11 @@ process RAW_VCF {
     label 'mem_1'
     label 'time_1'
     
-    publishDir "${params.outdir}/final_vcf", mode: 'copy', overwrite: true
+    publishDir "${params.outdir}/raw_vcf", mode: 'copy', overwrite: true
 
     container 'quay.io/biocontainers/bcftools:1.16--haef29d1_2'
 
+    // input file can be VCF or BCF as is handled equally by bcftools
     input:
     tuple val(meta), file(bcf_allpos)
 
@@ -94,7 +95,7 @@ process RAW_VCF {
     tuple val(meta), path("${out_vcf}"),  emit: out_vcf
 
     script:
-    out_vcf = "${meta.id}.vcf"
+    out_vcf = "${meta.id}.vcf.gz"
     if (params.only_report_alts)
         """
         bcftools view -o ${out_vcf} \
@@ -115,10 +116,11 @@ process FINAL_VCF {
     label 'mem_1'
     label 'time_1'
     
-    publishDir "${params.outdir}/raw_vcf", mode: 'copy', overwrite: true
+    publishDir "${params.outdir}/final_vcf", mode: 'copy', overwrite: true
 
     container 'quay.io/biocontainers/bcftools:1.16--haef29d1_2'
 
+    // input file can be VCF or BCF as is handled equally by bcftools
     input:
     tuple val(meta), file(vcf_allpos)
 
@@ -126,7 +128,7 @@ process FINAL_VCF {
     tuple val(meta), path("${out_vcf}"),  emit: out_vcf
 
     script:
-    out_vcf = "${meta.id}.vcf"
+    out_vcf = "${meta.id}.vcf.gz"
     if ( params.only_report_alts == true )
         """
         bcftools view -o ${out_vcf} \
