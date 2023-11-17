@@ -17,7 +17,7 @@ def printHelp() {
         --only_report_alts           When included this flag reports only ALT variants in the VCF output. default = true (optional)
         --VCF_filters                Parameters for filtering variants in VCF file. Default is to removing records below 50 quality score 
                                       and also requiring 3 reads from each strand with overall greater than 8. 
-                                      default = "QUAL>=50 & MIN(DP)>=8 & DP4[2]>3 & DP4[3]>3" (optional)
+                                      default = "QUAL>=50 & MIN(DP)>=8 & ((ALT!="." & DP4[2]>3 & DP4[3]>3) | (ALT="." & DP4[0]>3 & DP4[1]>3))" (optional)
         --skip_filtering             Do not filter variants called using `bcftools call` based on metrics defined with --VCF_filters.  default = false
         --keep_raw_vcf               Also publish the unfiltered VCF file i.e. direct output of `bcftools call`; can be combined with 
                                       --only_report_alts=false to report all (unfiltered, REF and ALT) variants; 
