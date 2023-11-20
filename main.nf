@@ -207,7 +207,7 @@ workflow {
         ch_vcf_final
     )
     
-    ch_vcf_final
+    FINAL_VCF.out.out_vcf
         .combine(ch_ref_index)
         .dump(tag: 'vcf_and_ref')
         .set { ch_vcf_and_ref }
