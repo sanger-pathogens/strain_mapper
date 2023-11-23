@@ -37,16 +37,7 @@ process BCFTOOLS_CALL {
     tuple val(meta), path("${vcf_allpos}"),  emit: vcf_allpos
 
     script:
-    vcf_allpos = "${meta.id}.bcf"
-    if (!params.skip_filtering)
-        """
-        bcftools call -o ${vcf_allpos} \
-            -O 'u' \
-            -V indels \
-            -m \
-            '${mpileup_file}'
-        """
-    else
+    vcf_allpos = "${meta.id}.vcf"   
         """
         bcftools call -o ${vcf_allpos} \
             -O 'v' \
