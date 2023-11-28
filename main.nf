@@ -124,6 +124,8 @@ workflow {
     // in the submodule repository assorted-sub-workflows
     //
     STRAIN_MAPPER( ch_reads, reference )
+
+}
 /*
 ========================================================================================
     THE END
