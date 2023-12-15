@@ -103,7 +103,7 @@ https://samtools.github.io/bcftools/bcftools.html#expressions
 
 ## Output
 
-BY defualt, only the final filtered variant (.vcf.gz) file and the cureated consensus sequence (.fasta) will be returned. if you wish to retain the intermadiate files such as the unfiltered VCF file or the sorted BAM files, please set the relevant parameters to `true` with `--keep_raw_vcf=true` and `--keep_sorted_bam=true`, respectively.
+By default, only the final filtered variant (.vcf.gz) file and the curated consensus sequence (.fasta) will be returned. If you wish to retain the intermediate files such as the unfiltered VCF file or the sorted BAM files, please set the relevant parameters to `true` with `--keep_raw_vcf=true` and `--keep_sorted_bam=true`, respectively.
 
 ## Contributions and testing
 
