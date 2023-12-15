@@ -84,8 +84,11 @@ Options:
    --reference                  Reference to map reads against (mandatory)
    --outdir                     Specify output directory [default: ./results] (optional)
    --only_report_alts           When included this flag reports only ALT variants in the VCF output. default = true (optional)
-  --keep_ref_variants          When included this flag reports reference variants in the vcf increasing time for BCFTOOLS call if used please alter default filters or skip filtering to not remove these default = null (optional)
-   --VCF_filters                Default filtering removing records below 50 quality score and also requiring 3 reads from each strand  with overall greater than 8. default = "QUAL>=50 & MIN(DP)>=8 & DP4[2]>3 & DP4[3]>3" (optional)
+   --keep_ref_variants          When included this flag reports reference variants in the vcf increasing time for BCFTOOLS call 
+                                if used please alter default filters or skip filtering to not remove these. default = null (optional)                              
+   --VCF_filters                Parameters for filtering variants in VCF file. Default is to removing records with a quality
+                                score below 50 and also requiring 3 reads from each strand with overall greater than 8. 
+                                default = "QUAL>=50 & MIN(DP)>=8 & ((ALT!="." & DP4[2]>3 & DP4[3]>3) | (ALT="." & DP4[0]>3 & DP4[1]>3))" (optional)
    --skip_filtering             Entirely skip filtering of the VCF file produced with `bcftools call`; default = false
    --keep_raw_vcf               Save the unfiltered VCF file i.e. direct output of `bcftools call`; can be combined with 
                                 --only_report_alts=false to report all (unfiltered, REF and ALT) variants; 

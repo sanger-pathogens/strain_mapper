@@ -15,7 +15,7 @@ def printHelp() {
         --reference                  Reference to map reads against (mandatory)
         --outdir                     Specify output directory [default: ./results] (optional)
         --only_report_alts           When included this flag reports only ALT variants in the VCF output. default = true (optional)
-        --VCF_filters                Parameters for filtering variants in VCF file. Default is to removing records below 50 quality score 
+        --VCF_filters                Parameters for filtering variants in VCF file. Default is to removing records with a quality score below 50
                                       and also requiring 3 reads from each strand with overall greater than 8. 
                                       default = "QUAL>=50 & MIN(DP)>=8 & ((ALT!="." & DP4[2]>3 & DP4[3]>3) | (ALT="." & DP4[0]>3 & DP4[1]>3))" (optional)
         --skip_filtering             Do not filter variants called using `bcftools call` based on metrics defined with --VCF_filters.  default = false
