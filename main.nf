@@ -12,27 +12,58 @@ def printHelp() {
     nextflow run main.nf [--manifest_of_reads <path to manifest>] [--manifest_of_lanes <path to manifest>] [--study <study_id>, [--runid <run_id>, [--laneid <lane_id>, [--plexid <plex_id>]]]] --reference <path to reference> --outdir <path to results folder>
 
     Input parameters:
-        There are two ways of providing input, which can be combined:
+
+      Sequencing reads:
+        There are two ways of providing input reads, which can be combined:
+
         1) through direct input of compressed fastq sequence reads files. This kind of input is passed by specifying the paths to the
            read files via a manifest listing the pair of read files pertaing to a sample, one per row.
+
         --manifest_of_reads          Manifest containing per-sample paths to .fastq.gz files (optional)
+
         2) through specification of data to be downloaded from iRODS. Each sample is defined by a combination of study, run, lane and plex ids
            (these ids correspond to the reference of the sequencing experiment). Run, lane and plex ids are not mandatory: when provided, these 
            parameters gradually restrict of files to be downloaded; when ommitted, samples for all possible values are retrieved.
            This information can be provided via a combination of workflow parameters passed on through command line options: --study, --runid, 
            --laneid and --plexid; this defines a single sequencing dataset based on a combination of study, run, lane and plex ids.
-           Alternatively, the user can provide a manifest listing a batch of such combinations.
-        --study
-        --runid
-        --laneid
-        --plexid
-        --manifest_of_lanes          Manifest containing specification of data to be downloaded from iRODS (optional)
+
+        --study                      ID of sequencing study including read data to use as pipeline input (mandatory)
+        --runid                      ID of sequencing run including read data to use as pipeline input (mandatory)
+        --laneid                     ID of sequencing lane (as in a lane within of a flow cell) including read data to use as pipeline input (mandatory)
+        --plexid                     ID of sequencing lane multiplex tag index including read data to use as pipeline input (mandatory)
+
+            Alternatively, the user can provide a manifest listing a batch of such combinations.
+
+       --manifest_of_lanes          Manifest containing specification of data to be downloaded from iRODS (optional)
                                      Each row defines a sequencing dataset based on a combination of study, run, lane and plex ids.
                                      Run, lane and plex ids are not mandatory (field in csv file can be left blank); 
                                      when provided, these gradually restrict of files to be downloaded.
+
+      NB: the real lane id is different from the the so-called \"lane\" id, a term commonly used in Sanger referring to this sequencing run output unit, usually labelled with this syntax: 48106_1#83.
+      In this, the run id is 48106, the (real) lane id is 1 and the plex id is 83.
         
+      Other input parameters:
         --reference                  Reference to map reads against (mandatory)
+    
+    Output parameters:
         --outdir                     Specify output directory [default: ./results] (optional)
+
+    General options:
+      --help                       Print summary of main parameters and options (optional)
+      --help_all                   Print extensive list of parameters and options (optional)
+        --help                       Print this help message (optional)
+    """.stripIndent()
+}
+
+def printHelpAll() {
+    printHelp()
+    log.info """
+
+    Procesing options:
+     iRODS extractor options:
+      --cleanup_intermediate_files_irods_extractor = false
+
+     Strain-mapper read mapping options:
         --only_report_alts           When included this flag reports only ALT variants in the VCF output. default = true (optional)
         --VCF_filters                Parameters for filtering variants in VCF file. Default is to removing records with a quality score below 50
                                       and also requiring 3 reads from each strand with overall greater than 8. 
@@ -42,12 +73,15 @@ def printHelp() {
                                       --only_report_alts=false to report all (unfiltered, REF and ALT) variants; 
                                       only relevant when --skip_filtering=false; default = false
         --keep_sorted_bam            Save the mapping file (sorted BAM); default = false
-        --help                       Print this help message (optional)
     """.stripIndent()
 }
 
 if (params.help) {
     printHelp()
+    exit(0)
+}
+if (params.help_all) {
+    printHelpAll()
     exit(0)
 }
 
