@@ -9,9 +9,28 @@
 def printHelp() {
     log.info """
     Usage:
-        nextflow run main.nf
-    Options:
-        --input                      Manifest containing per-sample paths to .fastq.gz files (mandatory)
+    nextflow run main.nf [--manifest_of_reads <path to manifest>] [--manifest_of_lanes <path to manifest>] [--study <study_id>, [--runid <run_id>, [--laneid <lane_id>, [--plexid <plex_id>]]]] --reference <path to reference> --outdir <path to results folder>
+
+    Input parameters:
+        There are two ways of providing input, which can be combined:
+        1) through direct input of compressed fastq sequence reads files. This kind of input is passed by specifying the paths to the
+           read files via a manifest listing the pair of read files pertaing to a sample, one per row.
+        --manifest_of_reads          Manifest containing per-sample paths to .fastq.gz files (optional)
+        2) through specification of data to be downloaded from iRODS. Each sample is defined by a combination of study, run, lane and plex ids
+           (these ids correspond to the reference of the sequencing experiment). Run, lane and plex ids are not mandatory: when provided, these 
+           parameters gradually restrict of files to be downloaded; when ommitted, samples for all possible values are retrieved.
+           This information can be provided via a combination of workflow parameters passed on through command line options: --study, --runid, 
+           --laneid and --plexid; this defines a single sequencing dataset based on a combination of study, run, lane and plex ids.
+           Alternatively, the user can provide a manifest listing a batch of such combinations.
+        --study
+        --runid
+        --laneid
+        --plexid
+        --manifest_of_lanes          Manifest containing specification of data to be downloaded from iRODS (optional)
+                                     Each row defines a sequencing dataset based on a combination of study, run, lane and plex ids.
+                                     Run, lane and plex ids are not mandatory (field in csv file can be left blank); 
+                                     when provided, these gradually restrict of files to be downloaded.
+        
         --reference                  Reference to map reads against (mandatory)
         --outdir                     Specify output directory [default: ./results] (optional)
         --only_report_alts           When included this flag reports only ALT variants in the VCF output. default = true (optional)
@@ -72,8 +91,12 @@ def validate_path_param(
 def validate_parameters() {
     def errors = 0
 
-    errors += validate_path_param("--input", params.input)
     errors += validate_path_param("--reference", params.reference)
+
+    if (params.manifest_of_reads == "") | (params.manifest_of_lanes == "") | (params.study < 0){
+        log.error(String.format("No input provided; please spcify at least one of the following options: --manifest_of_reads, --manifest_of_lanes or --study", errors))
+        errors += 1
+    }
 
     if (errors > 0) {
         log.error(String.format("%d errors detected", errors))
@@ -106,7 +129,7 @@ workflow {
     //
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
     //
-    ch_input = file(params.input)
+    ch_input = file(params.manifest_of_reads)
     INPUT_CHECK (
         ch_input
     )
