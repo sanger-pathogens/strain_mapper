@@ -151,6 +151,9 @@ validate_parameters()
 //
 include { INPUT_CHECK } from './subworkflows/input_check'
 include { STRAIN_MAPPER } from './assorted-sub-workflows/strain_mapper/strain_mapper.nf'
+include { IRODS_EXTRACTOR } from './assorted-sub-workflows/irods_extractor/subworkflows/irods.nf'
+include { IRODS_MANIFEST_PARSE } from './assorted-sub-workflows/irods_extractor/subworkflows/irods_manifest_parse.nf'
+
 
 /*
 ========================================================================================
@@ -161,20 +164,42 @@ include { STRAIN_MAPPER } from './assorted-sub-workflows/strain_mapper/strain_ma
 workflow {
 
     //
-    // SUBWORKFLOW: Read in samplesheet, validate and stage input files
-    //
-    ch_input = file(params.manifest_of_reads)
-    INPUT_CHECK (
-        ch_input
-    )
-    INPUT_CHECK.out.shortreads
-        .dump(tag: 'ch_reads')
-        .set { ch_reads }
-
-    //
     // REFERENCE PROCESSING 
     //
     reference = file(params.reference, checkIfExists: true)
+
+    //
+    // SUBWORKFLOW: Read in samplesheet, validate and stage input files
+    //
+    input_reads_ch = file(params.manifest_of_reads)
+    INPUT_CHECK (
+        input_reads_ch
+    )
+    INPUT_CHECK.out.shortreads
+        .dump(tag: 'ch_reads_from_manifest')
+        .set { ch_reads_from_manifest }
+
+    //
+    // SUBWORKFLOW: Read in study, run, etc. parameters and pull data from iRODS
+    //
+    Channel.of([params.study, params.runid, params.laneid, params.plexid]).set{ input_irods_opt_ch } 
+
+    input_irods_man_ch = file(params.manifest_of_lanes)
+    IRODS_MANIFEST_PARSE(
+        input_irods_man_ch
+    )
+    // combine iRODS specs input channels
+    input_irods_opt_ch.mix(input_irods_man_ch).set{ input_irods_ch }
+
+    IRODS_EXTRACT(
+        input_irods_ch
+    )
+    IRODS_EXTRACT.out.reads_ch
+        .dump(tag: 'ch_reads_from_irods')
+        .set { ch_reads_from_irods }
+
+    // combine reads input channels
+    ch_reads_from_manifest.mix(ch_reads_from_irods).set{ ch_reads }
 
     //
     // SUBWORKFLOW: actual processing; 
