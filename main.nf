@@ -127,7 +127,7 @@ def validate_parameters() {
 
     errors += validate_path_param("--reference", params.reference)
 
-    if ((params.manifest_of_reads == "") || (params.manifest_of_lanes == "") || (params.study < 0)){
+    if ((params.manifest_of_reads == "") || (params.manifest_of_lanes == "") || (params.study == -1)){
         log.error(String.format("No input provided; please spcify at least one of the following options: --manifest_of_reads, --manifest_of_lanes or --study", errors))
         errors += 1
     }
@@ -138,7 +138,7 @@ def validate_parameters() {
     }
 }
 
-validate_parameters()
+//validate_parameters()
 
 /*
 ========================================================================================
@@ -171,48 +171,68 @@ workflow {
     //
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
     //
-    input_reads_ch = file(params.manifest_of_reads)
-    INPUT_CHECK (
-        input_reads_ch
-    )
-    INPUT_CHECK.out.shortreads
-        .dump(tag: 'ch_reads_from_manifest')
-        .set { ch_reads_from_manifest }
-
+    if (params.manifest_of_reads) {
+        input_reads_ch = file(params.manifest_of_reads)
+        INPUT_CHECK (
+            input_reads_ch
+        )
+        INPUT_CHECK.out.shortreads
+            .dump(tag: 'ch_reads_from_manifest')
+            .set { ch_reads_from_manifest }
+    } else {
+        Channel.of("none").set{ ch_reads_from_manifest }
+    }
     //
     // SUBWORKFLOW: Read in study, run, etc. parameters and pull data from iRODS
     //
 
     // take iRODS dataset specification from CLI options
-    Channel.of([params.study, params.runid, params.laneid, params.plexid]).set{ input_irods_from_opt_ch } 
-
+    if (params.study) {
+        param_input = Channel.of(["${params.study}", "${params.runid}", "${params.laneid}", "${params.plexid}"])
+        
+        param_input.map{ study, runid, laneid, plexid ->
+            meta = [:]
+            if (study > 0) {meta.study = study}
+            if (runid > 0) {meta.runid = runid}
+            if (laneid > 0 ) {meta.laneid = laneid}
+            if (plexid > 0 ) {meta.plexid = plexid}
+            meta
+        }.set{ input_irods_from_opt_ch } 
+    } else {
+        Channel.of("none").set{ input_irods_from_opt_ch }
+    }    
     // take iRODS dataset specification from manifest of lanes
-    input_irods_man_ch = file(params.manifest_of_lanes)
-    IRODS_MANIFEST_PARSE(
-        input_irods_man_ch
-    )
-    IRODS_MANIFEST_PARSE.out.meta.set{ input_irods_from_man_ch }
+    if (params.manifest_of_lanes) {
+        IRODS_MANIFEST_PARSE()
+        | set{ input_irods_from_man_ch }
+    } else {
+        Channel.of("none").set{ input_irods_from_man_ch}
+    }
 
     // combine iRODS specs input channels
     input_irods_from_opt_ch.mix(input_irods_from_man_ch).set{ input_irods_ch }
-    
+
     // pull reads from iRODS
     IRODS_EXTRACTOR(
-        input_irods_ch
+        input_irods_ch.filter{ it != "none"}
     )
-    IRODS_EXTRACTOR.out.reads_ch
-        .dump(tag: 'ch_reads_from_irods')
-        .set { ch_reads_from_irods }
 
     // combine reads input channels
-    ch_reads_from_manifest.mix(ch_reads_from_irods).set{ ch_reads }
+    IRODS_EXTRACTOR.out.reads_ch.mix(ch_reads_from_manifest.filter{ it != "none"}).set{ ch_reads }
 
     //
     // SUBWORKFLOW: actual processing; 
     // please refer to  the Nextflow subworkflow strain_mapper
     // in the submodule repository assorted-sub-workflows
     //
-    STRAIN_MAPPER( ch_reads, reference )
+    ch_reads.map{ meta, read_1, read_2 ->
+        meta_new = [:]
+        meta_new.id = meta.ID
+        reads = [read_1, read_2]
+        [ meta_new, reads ]
+    }.set{ ready_to_map }
+
+    STRAIN_MAPPER( ready_to_map, reference )
 
 }
 /*
