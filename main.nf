@@ -203,7 +203,7 @@ workflow {
     }    
     // take iRODS dataset specification from manifest of lanes
     if (params.manifest_of_lanes) {
-        IRODS_MANIFEST_PARSE()
+        IRODS_MANIFEST_PARSE(params.manifest_of_lanes)
         | set{ input_irods_from_man_ch }
     } else {
         Channel.of("none").set{ input_irods_from_man_ch}
