@@ -197,10 +197,10 @@ workflow {
     input_irods_from_opt_ch.mix(input_irods_from_man_ch).set{ input_irods_ch }
     
     // pull reads from iRODS
-    IRODS_EXTRACT(
+    IRODS_EXTRACTOR(
         input_irods_ch
     )
-    IRODS_EXTRACT.out.reads_ch
+    IRODS_EXTRACTOR.out.reads_ch
         .dump(tag: 'ch_reads_from_irods')
         .set { ch_reads_from_irods }
 
