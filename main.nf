@@ -127,7 +127,7 @@ def validate_parameters() {
 
     errors += validate_path_param("--reference", params.reference)
 
-    if (params.manifest_of_reads == "") || (params.manifest_of_lanes == "") || (params.study < 0){
+    if ((params.manifest_of_reads == "") || (params.manifest_of_lanes == "") || (params.study < 0)){
         log.error(String.format("No input provided; please spcify at least one of the following options: --manifest_of_reads, --manifest_of_lanes or --study", errors))
         errors += 1
     }
