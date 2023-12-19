@@ -182,15 +182,21 @@ workflow {
     //
     // SUBWORKFLOW: Read in study, run, etc. parameters and pull data from iRODS
     //
-    Channel.of([params.study, params.runid, params.laneid, params.plexid]).set{ input_irods_opt_ch } 
 
+    // take iRODS dataset specification from CLI options
+    Channel.of([params.study, params.runid, params.laneid, params.plexid]).set{ input_irods_from_opt_ch } 
+
+    // take iRODS dataset specification from manifest of lanes
     input_irods_man_ch = file(params.manifest_of_lanes)
     IRODS_MANIFEST_PARSE(
         input_irods_man_ch
     )
-    // combine iRODS specs input channels
-    input_irods_opt_ch.mix(input_irods_man_ch).set{ input_irods_ch }
+    IRODS_MANIFEST_PARSE.out.meta.set{ input_irods_from_man_ch }
 
+    // combine iRODS specs input channels
+    input_irods_from_opt_ch.mix(input_irods_from_man_ch).set{ input_irods_ch }
+    
+    // pull reads from iRODS
     IRODS_EXTRACT(
         input_irods_ch
     )
