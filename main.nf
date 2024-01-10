@@ -9,11 +9,61 @@
 def printHelp() {
     log.info """
     Usage:
-        nextflow run main.nf
-    Options:
-        --input                      Manifest containing per-sample paths to .fastq.gz files (mandatory)
+    nextflow run main.nf [--manifest_of_reads <path to manifest>] [--manifest_of_lanes <path to manifest>] [--study <study_id>, [--runid <run_id>, [--laneid <lane_id>, [--plexid <plex_id>]]]] --reference <path to reference> --outdir <path to results folder>
+
+    Input parameters:
+
+      Sequencing reads:
+        There are two ways of providing input reads, which can be combined:
+
+        1) through direct input of compressed fastq sequence reads files. This kind of input is passed by specifying the paths to the
+           read files via a manifest listing the pair of read files pertaing to a sample, one per row.
+
+        --manifest_of_reads          Manifest containing per-sample paths to .fastq.gz files (optional)
+
+        2) through specification of data to be downloaded from iRODS. Each sample is defined by a combination of study, run, lane and plex ids
+           (these ids correspond to the reference of the sequencing experiment). Run, lane and plex ids are not mandatory: when provided, these 
+           parameters gradually restrict of files to be downloaded; when ommitted, samples for all possible values are retrieved.
+           This information can be provided via a combination of workflow parameters passed on through command line options: --study, --runid, 
+           --laneid and --plexid; this defines a single sequencing dataset based on a combination of study, run, lane and plex ids.
+
+        --study                      ID of sequencing study including read data to use as pipeline input (mandatory)
+        --runid                      ID of sequencing run including read data to use as pipeline input (mandatory)
+        --laneid                     ID of sequencing lane (as in a lane within of a flow cell) including read data to use as pipeline input (mandatory)
+        --plexid                     ID of sequencing lane multiplex tag index including read data to use as pipeline input (mandatory)
+
+            Alternatively, the user can provide a manifest listing a batch of such combinations.
+
+       --manifest_of_lanes          Manifest containing specification of data to be downloaded from iRODS (optional)
+                                     Each row defines a sequencing dataset based on a combination of study, run, lane and plex ids.
+                                     Run, lane and plex ids are not mandatory (field in csv file can be left blank); 
+                                     when provided, these gradually restrict of files to be downloaded.
+
+      NB: the real lane id is different from the the so-called \"lane\" id, a term commonly used in Sanger referring to this sequencing run output unit, usually labelled with this syntax: 48106_1#83.
+      In this, the run id is 48106, the (real) lane id is 1 and the plex id is 83.
+        
+      Other input parameters:
         --reference                  Reference to map reads against (mandatory)
+    
+    Output parameters:
         --outdir                     Specify output directory [default: ./results] (optional)
+
+    General options:
+      --help                       Print summary of main parameters and options (optional)
+      --help_all                   Print extensive list of parameters and options (optional)
+        --help                       Print this help message (optional)
+    """.stripIndent()
+}
+
+def printHelpAll() {
+    printHelp()
+    log.info """
+
+    Procesing options:
+     iRODS extractor options:
+      --cleanup_intermediate_files_irods_extractor = false
+
+     Strain-mapper read mapping options:
         --only_report_alts           When included this flag reports only ALT variants in the VCF output. default = true (optional)
         --VCF_filters                Parameters for filtering variants in VCF file. Default is to removing records with a quality score below 50
                                       and also requiring 3 reads from each strand with overall greater than 8. 
@@ -23,12 +73,15 @@ def printHelp() {
                                       --only_report_alts=false to report all (unfiltered, REF and ALT) variants; 
                                       only relevant when --skip_filtering=false; default = false
         --keep_sorted_bam            Save the mapping file (sorted BAM); default = false
-        --help                       Print this help message (optional)
     """.stripIndent()
 }
 
 if (params.help) {
     printHelp()
+    exit(0)
+}
+if (params.help_all) {
+    printHelpAll()
     exit(0)
 }
 
@@ -72,8 +125,12 @@ def validate_path_param(
 def validate_parameters() {
     def errors = 0
 
-    errors += validate_path_param("--input", params.input)
     errors += validate_path_param("--reference", params.reference)
+
+    if ((params.manifest_of_reads == "") || (params.manifest_of_lanes == "") || (params.study == -1)){
+        log.error(String.format("No input provided; please spcify at least one of the following options: --manifest_of_reads, --manifest_of_lanes or --study", errors))
+        errors += 1
+    }
 
     if (errors > 0) {
         log.error(String.format("%d errors detected", errors))
@@ -81,7 +138,7 @@ def validate_parameters() {
     }
 }
 
-validate_parameters()
+//validate_parameters()
 
 /*
 ========================================================================================
@@ -94,6 +151,9 @@ validate_parameters()
 //
 include { INPUT_CHECK } from './subworkflows/input_check'
 include { STRAIN_MAPPER } from './assorted-sub-workflows/strain_mapper/strain_mapper.nf'
+include { IRODS_EXTRACTOR } from './assorted-sub-workflows/irods_extractor/subworkflows/irods.nf'
+include { IRODS_MANIFEST_PARSE } from './assorted-sub-workflows/irods_extractor/subworkflows/irods_manifest_parse.nf'
+
 
 /*
 ========================================================================================
@@ -104,27 +164,77 @@ include { STRAIN_MAPPER } from './assorted-sub-workflows/strain_mapper/strain_ma
 workflow {
 
     //
-    // SUBWORKFLOW: Read in samplesheet, validate and stage input files
-    //
-    ch_input = file(params.input)
-    INPUT_CHECK (
-        ch_input
-    )
-    INPUT_CHECK.out.shortreads
-        .dump(tag: 'ch_reads')
-        .set { ch_reads }
-
-    //
     // REFERENCE PROCESSING 
     //
     reference = file(params.reference, checkIfExists: true)
+
+    //
+    // SUBWORKFLOW: Read in samplesheet, validate and stage input files
+    //
+    if (params.manifest_of_reads) {
+        input_reads_ch = file(params.manifest_of_reads)
+        INPUT_CHECK (
+            input_reads_ch
+        )
+        INPUT_CHECK.out.shortreads
+            .dump(tag: 'ch_reads_from_manifest')
+            .set { ch_reads_from_manifest }
+    } else {
+        Channel.of("none").set{ ch_reads_from_manifest }
+    }
+    //
+    // SUBWORKFLOW: Read in study, run, etc. parameters and pull data from iRODS
+    //
+
+    // take iRODS dataset specification from CLI options
+    if (params.study) {
+        param_input = Channel.of(["${params.study}", "${params.runid}", "${params.laneid}", "${params.plexid}"])
+        
+        param_input.map{ study, runid, laneid, plexid ->
+            meta = [:]
+            if (study > 0) {meta.study = study}
+            if (runid > 0) {meta.runid = runid}
+            if (laneid > 0 ) {meta.laneid = laneid}
+            if (plexid > 0 ) {meta.plexid = plexid}
+            meta
+        }.set{ input_irods_from_opt_ch } 
+    } else {
+        Channel.of("none").set{ input_irods_from_opt_ch }
+    }    
+    // take iRODS dataset specification from manifest of lanes
+    if (params.manifest_of_lanes) {
+        IRODS_MANIFEST_PARSE(params.manifest_of_lanes)
+        | set{ input_irods_from_man_ch }
+    } else {
+        Channel.of("none").set{ input_irods_from_man_ch}
+    }
+
+    // combine iRODS specs input channels
+    input_irods_from_opt_ch.mix(input_irods_from_man_ch).set{ input_irods_ch }
+
+    // pull reads from iRODS
+    IRODS_EXTRACTOR(
+        input_irods_ch.filter{ it != "none"}
+    )
+
+    // change channel structure to match that from INPUT_CHECK
+    IRODS_EXTRACTOR.out.reads_ch.map{ meta, read_1, read_2 ->
+        meta_new = [:]
+        meta_new.id = meta.ID
+        reads = [read_1, read_2]
+        [ meta_new, reads ]
+    }.set{ irods_ready_to_map_ch }
+
+    // combine reads input channels
+    irods_ready_to_map_ch.mix(ch_reads_from_manifest.filter{ it != "none"}).set{ all_reads_ready_to_map_ch }
 
     //
     // SUBWORKFLOW: actual processing; 
     // please refer to  the Nextflow subworkflow strain_mapper
     // in the submodule repository assorted-sub-workflows
     //
-    STRAIN_MAPPER( ch_reads, reference )
+
+    STRAIN_MAPPER( all_reads_ready_to_map_ch, reference )
 
 }
 /*
