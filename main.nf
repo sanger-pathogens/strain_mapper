@@ -217,22 +217,24 @@ workflow {
         input_irods_ch.filter{ it != "none"}
     )
 
+    // change channel structure to match that from INPUT_CHECK
+    IRODS_EXTRACTOR.out.reads_ch.map{ meta, read_1, read_2 ->
+        meta_new = [:]
+        meta_new.id = meta.ID
+        reads = [read_1, read_2]
+        [ meta_new, reads ]
+    }.set{ irods_ready_to_map_ch }
+
     // combine reads input channels
-    IRODS_EXTRACTOR.out.reads_ch.mix(ch_reads_from_manifest.filter{ it != "none"}).set{ ch_reads }
+    irods_ready_to_map_ch.mix(ch_reads_from_manifest.filter{ it != "none"}).set{ all_reads_ready_to_map_ch }
 
     //
     // SUBWORKFLOW: actual processing; 
     // please refer to  the Nextflow subworkflow strain_mapper
     // in the submodule repository assorted-sub-workflows
     //
-    ch_reads.map{ meta, read_1, read_2 ->
-        meta_new = [:]
-        meta_new.id = meta.ID
-        reads = [read_1, read_2]
-        [ meta_new, reads ]
-    }.set{ ready_to_map }
 
-    STRAIN_MAPPER( ready_to_map, reference )
+    STRAIN_MAPPER( all_reads_ready_to_map_ch, reference )
 
 }
 /*

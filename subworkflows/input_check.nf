@@ -40,6 +40,6 @@ def create_fastq_channels(LinkedHashMap row) {
         }
         fastq_2 = file(row.R2)
     } else { fastq_2 = 'NA' }
-    array = [ meta, fastq_1, fastq_2 ]
+    array = [ meta, [ fastq_1, fastq_2 ] ]
     return array
 }
