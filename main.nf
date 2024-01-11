@@ -27,7 +27,7 @@ def printHelp() {
            This information can be provided via a combination of workflow parameters passed on through command line options: --study, --runid, 
            --laneid and --plexid; this defines a single sequencing dataset based on a combination of study, run, lane and plex ids.
 
-        --study                      ID of sequencing study including read data to use as pipeline input (mandatory)
+        --studyid                    ID of sequencing study including read data to use as pipeline input (mandatory)
         --runid                      ID of sequencing run including read data to use as pipeline input (mandatory)
         --laneid                     ID of sequencing lane (as in a lane within of a flow cell) including read data to use as pipeline input (mandatory)
         --plexid                     ID of sequencing lane multiplex tag index including read data to use as pipeline input (mandatory)
@@ -188,11 +188,11 @@ workflow {
 
     // take iRODS dataset specification from CLI options
     if (params.study) {
-        param_input = Channel.of(["${params.study}", "${params.runid}", "${params.laneid}", "${params.plexid}"])
+        param_input = Channel.of(["${params.studyid}", "${params.runid}", "${params.laneid}", "${params.plexid}"])
         
-        param_input.map{ study, runid, laneid, plexid ->
+        param_input.map{ studyid, runid, laneid, plexid ->
             meta = [:]
-            if (study > 0) {meta.study = study}
+            if (studyid > 0) {meta.studyid = studyid}
             if (runid > 0) {meta.runid = runid}
             if (laneid > 0 ) {meta.laneid = laneid}
             if (plexid > 0 ) {meta.plexid = plexid}
