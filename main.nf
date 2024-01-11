@@ -9,7 +9,7 @@
 def printHelp() {
     log.info """
     Usage:
-    nextflow run main.nf [--manifest_of_reads <path to manifest>] [--manifest_of_lanes <path to manifest>] [--study <study_id>, [--runid <run_id>, [--laneid <lane_id>, [--plexid <plex_id>]]]] --reference <path to reference> --outdir <path to results folder>
+    nextflow run main.nf [--manifest_of_reads <path to manifest>] [--manifest_of_lanes <path to manifest>] [--studyid <study_id>, [--runid <run_id>, [--laneid <lane_id>, [--plexid <plex_id>]]]] --reference <path to reference> --outdir <path to results folder>
 
     Input parameters:
 
@@ -27,7 +27,7 @@ def printHelp() {
            This information can be provided via a combination of workflow parameters passed on through command line options: --study, --runid, 
            --laneid and --plexid; this defines a single sequencing dataset based on a combination of study, run, lane and plex ids.
 
-        --study                      ID of sequencing study including read data to use as pipeline input (mandatory)
+        --studyid                    ID of sequencing study including read data to use as pipeline input (mandatory)
         --runid                      ID of sequencing run including read data to use as pipeline input (mandatory)
         --laneid                     ID of sequencing lane (as in a lane within of a flow cell) including read data to use as pipeline input (mandatory)
         --plexid                     ID of sequencing lane multiplex tag index including read data to use as pipeline input (mandatory)
@@ -127,8 +127,8 @@ def validate_parameters() {
 
     errors += validate_path_param("--reference", params.reference)
 
-    if ((params.manifest_of_reads == "") || (params.manifest_of_lanes == "") || (params.study == -1)){
-        log.error(String.format("No input provided; please spcify at least one of the following options: --manifest_of_reads, --manifest_of_lanes or --study", errors))
+    if ((params.manifest_of_reads == "") || (params.manifest_of_lanes == "") || (params.studyid == -1)){
+        log.error(String.format("No input provided; please spcify at least one of the following options: --manifest_of_reads, --manifest_of_lanes or --studyid", errors))
         errors += 1
     }
 
@@ -187,12 +187,12 @@ workflow {
     //
 
     // take iRODS dataset specification from CLI options
-    if (params.study) {
-        param_input = Channel.of(["${params.study}", "${params.runid}", "${params.laneid}", "${params.plexid}"])
+    if (params.studyid) {
+        param_input = Channel.of(["${params.studyid}", "${params.runid}", "${params.laneid}", "${params.plexid}"])
         
-        param_input.map{ study, runid, laneid, plexid ->
+        param_input.map{ studyid, runid, laneid, plexid ->
             meta = [:]
-            if (study > 0) {meta.study = study}
+            if (studyid > 0) {meta.studyid = studyid}
             if (runid > 0) {meta.runid = runid}
             if (laneid > 0 ) {meta.laneid = laneid}
             if (plexid > 0 ) {meta.plexid = plexid}
