@@ -78,23 +78,49 @@ Please run `--help` on these scripts for more information on script usage.
 
 ```console
 Usage:
-   nextflow run main.nf
-Options:
-   --input                      Manifest containing per-sample paths to .fastq.gz files (mandatory)
-   --reference                  Reference to map reads against (mandatory)
-   --outdir                     Specify output directory [default: ./results] (optional)
-   --only_report_alts           When included this flag reports only ALT variants in the VCF output. default = true (optional)
-   --keep_ref_variants          When included this flag reports reference variants in the vcf increasing time for BCFTOOLS call 
-                                if used please alter default filters or skip filtering to not remove these. default = null (optional)                              
-   --VCF_filters                Parameters for filtering variants in VCF file. Default is to removing records with a quality
-                                score below 50 and also requiring 3 reads from each strand with overall greater than 8. 
-                                default = "QUAL>=50 & MIN(DP)>=8 & ((ALT!="." & DP4[2]>3 & DP4[3]>3) | (ALT="." & DP4[0]>3 & DP4[1]>3))" (optional)
-   --skip_filtering             Entirely skip filtering of the VCF file produced with `bcftools call`; default = false
-   --keep_raw_vcf               Save the unfiltered VCF file i.e. direct output of `bcftools call`; can be combined with 
-                                --only_report_alts=false to report all (unfiltered, REF and ALT) variants; 
-                                only relevant when --skip_filtering=false; default = false
-   --keep_sorted_bam            Save the mapping file (sorted BAM); default = false
-   --help                       Print this help message (optional)
+strain-mapper [--manifest_of_reads <path to manifest>] [--manifest_of_lanes <path to manifest>] [--studyid <study_id>, [--runid <run_id>, [--laneid <lane_id>, [--plexid <plex_id>]]]] --reference <path to reference> --outdir <path to results folder>
+
+Input parameters:
+
+  Sequencing reads:
+    There are two ways of providing input reads, which can be combined:
+
+    1) through direct input of compressed fastq sequence reads files. This kind of input is passed by specifying the paths to the
+       read files via a manifest listing the pair of read files pertaing to a sample, one per row.
+
+    --manifest_of_reads          Manifest containing per-sample paths to .fastq.gz files (optional)
+
+    2) through specification of data to be downloaded from iRODS. Each sample is defined by a combination of study, run, lane and plex ids
+       (these ids correspond to the reference of the sequencing experiment). Run, lane and plex ids are not mandatory: when provided, these
+       parameters gradually restrict of files to be downloaded; when ommitted, samples for all possible values are retrieved.
+       This information can be provided via a combination of workflow parameters passed on through command line options: --study, --runid,
+       --laneid and --plexid; this defines a single sequencing dataset based on a combination of study, run, lane and plex ids.
+
+    --studyid                    ID of sequencing study including read data to use as pipeline input (mandatory)
+    --runid                      ID of sequencing run including read data to use as pipeline input (mandatory)
+    --laneid                     ID of sequencing lane (as in a lane within of a flow cell) including read data to use as pipeline input (mandatory)
+    --plexid                     ID of sequencing lane multiplex tag index including read data to use as pipeline input (mandatory)
+
+        Alternatively, the user can provide a manifest listing a batch of such combinations.
+
+   --manifest_of_lanes          Manifest containing specification of data to be downloaded from iRODS (optional)
+                                 Each row defines a sequencing dataset based on a combination of study, run, lane and plex ids.
+                                 Run, lane and plex ids are not mandatory (field in csv file can be left blank);
+                                 when provided, these gradually restrict of files to be downloaded.
+
+  NB: the real lane id is different from the the so-called "lane" id, a term commonly used in Sanger referring to this sequencing run output unit, usually labelled with this syntax: 48106_1#83.
+  In this, the run id is 48106, the (real) lane id is 1 and the plex id is 83.
+
+  Other input parameters:
+    --reference                  Reference to map reads against (mandatory)
+
+Output parameters:
+    --outdir                     Specify output directory [default: ./results] (optional)
+
+General options:
+  --help                       Print summary of main parameters and options (optional)
+  --help_all                   Print extensive list of parameters and options (optional)
+    --help                       Print this help message (optional)
 ```
 ## Default filtering
 

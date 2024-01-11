@@ -24,13 +24,13 @@ def printHelp() {
         2) through specification of data to be downloaded from iRODS. Each sample is defined by a combination of study, run, lane and plex ids
            (these ids correspond to the reference of the sequencing experiment). Run, lane and plex ids are not mandatory: when provided, these 
            parameters gradually restrict of files to be downloaded; when ommitted, samples for all possible values are retrieved.
-           This information can be provided via a combination of workflow parameters passed on through command line options: --study, --runid, 
+           This information can be provided via a combination of workflow parameters passed on through command line options: --studyid, --runid, 
            --laneid and --plexid; this defines a single sequencing dataset based on a combination of study, run, lane and plex ids.
 
-        --studyid                    ID of sequencing study including read data to use as pipeline input (mandatory)
-        --runid                      ID of sequencing run including read data to use as pipeline input (mandatory)
-        --laneid                     ID of sequencing lane (as in a lane within of a flow cell) including read data to use as pipeline input (mandatory)
-        --plexid                     ID of sequencing lane multiplex tag index including read data to use as pipeline input (mandatory)
+        --studyid                    ID of sequencing study including read data to use as pipeline input (optional)
+        --runid                      ID of sequencing run including read data to use as pipeline input (optional)
+        --laneid                     ID of sequencing lane (as in a lane within of a flow cell) including read data to use as pipeline input (optional)
+        --plexid                     ID of sequencing lane multiplex tag index including read data to use as pipeline input (optional)
 
             Alternatively, the user can provide a manifest listing a batch of such combinations.
 
