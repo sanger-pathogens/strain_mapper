@@ -9,7 +9,7 @@
 def printHelp() {
     log.info """
     Usage:
-    nextflow run main.nf [--manifest_of_reads <path to manifest>] [--manifest_of_lanes <path to manifest>] [--study <study_id>, [--runid <run_id>, [--laneid <lane_id>, [--plexid <plex_id>]]]] --reference <path to reference> --outdir <path to results folder>
+    nextflow run main.nf [--manifest_of_reads <path to manifest>] [--manifest_of_lanes <path to manifest>] [--studyid <study_id>, [--runid <run_id>, [--laneid <lane_id>, [--plexid <plex_id>]]]] --reference <path to reference> --outdir <path to results folder>
 
     Input parameters:
 
@@ -127,8 +127,8 @@ def validate_parameters() {
 
     errors += validate_path_param("--reference", params.reference)
 
-    if ((params.manifest_of_reads == "") || (params.manifest_of_lanes == "") || (params.study == -1)){
-        log.error(String.format("No input provided; please spcify at least one of the following options: --manifest_of_reads, --manifest_of_lanes or --study", errors))
+    if ((params.manifest_of_reads == "") || (params.manifest_of_lanes == "") || (params.studyid == -1)){
+        log.error(String.format("No input provided; please spcify at least one of the following options: --manifest_of_reads, --manifest_of_lanes or --studyid", errors))
         errors += 1
     }
 
@@ -187,7 +187,7 @@ workflow {
     //
 
     // take iRODS dataset specification from CLI options
-    if (params.study) {
+    if (params.studyid) {
         param_input = Channel.of(["${params.studyid}", "${params.runid}", "${params.laneid}", "${params.plexid}"])
         
         param_input.map{ studyid, runid, laneid, plexid ->
