@@ -187,7 +187,7 @@ workflow {
     //
 
     // take iRODS dataset specification from CLI options
-    if (params.studyid) {
+    if (params.studyid > 0) {
         param_input = Channel.of(["${params.studyid}", "${params.runid}", "${params.laneid}", "${params.plexid}"])
         
         param_input.map{ studyid, runid, laneid, plexid ->
