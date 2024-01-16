@@ -51,7 +51,6 @@ def printHelp() {
     General options:
       --help                       Print summary of main parameters and options (optional)
       --help_all                   Print extensive list of parameters and options (optional)
-        --help                       Print this help message (optional)
     """.stripIndent()
 }
 
