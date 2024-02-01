@@ -72,6 +72,8 @@ def printHelpAll() {
                                       --only_report_alts=false to report all (unfiltered, REF and ALT) variants; 
                                       only relevant when --skip_filtering=false; default = false
         --keep_sorted_bam            Save the mapping file (sorted BAM); default = false
+        --save_fastqs                Save the fastq read files directly into the results directory; default = false (incompatible with --save_nested_fastqs)
+        --save_nested_fastqs                Save the fastq read files within sample specific subdirectories; default = false (incompatible with --save_fastqs)
     """.stripIndent()
 }
 
