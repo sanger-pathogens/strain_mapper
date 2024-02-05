@@ -121,6 +121,10 @@ workflow {
     STRAIN_MAPPER( all_reads_ready_to_map_ch, reference )
 
 }
+
+workflow.onComplete {
+        NextflowTool.summary(workflow, params, log)
+}
 /*
 ========================================================================================
     THE END
