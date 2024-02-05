@@ -58,6 +58,10 @@
                 "title": "Strain-mapper read mapping options:",
                 "subtext": ""
             },
+            "mapper": {
+                "default": "bwa",
+                "help_text": "mapping tool to use options [bwa, bowtie2]"
+            },
             "only_report_alts": {
                 "default": "true",
                 "help_text": "When included this flag reports only ALT variants in the VCF output"
