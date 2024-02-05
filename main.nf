@@ -6,6 +6,11 @@
 ========================================================================================
 */
 
+def logo = NextflowTool.logo(workflow, params.monochrome_logs)
+
+log.info logo
+
+
 def printHelp() {
     log.info """
     Usage:
