@@ -125,6 +125,7 @@ workflow {
 workflow.onComplete {
         NextflowTool.summary(workflow, params, log)
 }
+
 /*
 ========================================================================================
     THE END
