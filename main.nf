@@ -63,17 +63,21 @@ def printHelpAll() {
       --cleanup_intermediate_files_irods_extractor = false
 
      Strain-mapper read mapping options:
-        --only_report_alts           When included this flag reports only ALT variants in the VCF output. default = true (optional)
-        --VCF_filters                Parameters for filtering variants in VCF file. Default is to removing records with a quality score below 50
-                                      and also requiring 3 reads from each strand with overall greater than 8. 
-                                      default = "QUAL>=50 & MIN(DP)>=8 & ((ALT!="." & DP4[2]>3 & DP4[3]>3) | (ALT="." & DP4[0]>3 & DP4[1]>3))" (optional)
-        --skip_filtering             Do not filter variants called using `bcftools call` based on metrics defined with --VCF_filters.  default = false
-        --keep_raw_vcf               Save the unfiltered VCF file i.e. direct output of `bcftools call`; can be combined with 
-                                      --only_report_alts=false to report all (unfiltered, REF and ALT) variants; 
-                                      only relevant when --skip_filtering=false; default = false
-        --keep_sorted_bam            Save the mapping file (sorted BAM); default = false
-        --save_fastqs                Save the fastq read files directly into the results directory; default = false (incompatible with --save_nested_fastqs)
-        --save_nested_fastqs                Save the fastq read files within sample specific subdirectories; default = false (incompatible with --save_fastqs)
+        --only_report_alts          When included this flag reports only ALT variants in the VCF output. default = true (optional)
+        --VCF_filters               Parameters for filtering variants in VCF file. Default is to removing records with a quality score below 50
+                                     and also requiring 3 reads from each strand with overall greater than 8. 
+                                     default = "QUAL>=50 & MIN(DP)>=8 & ((ALT!="." & DP4[2]>3 & DP4[3]>3) | (ALT="." & DP4[0]>3 & DP4[1]>3))" (optional)
+        --skip_filtering            Do not filter variants called using `bcftools call` based on metrics defined with --VCF_filters.  default = false
+        --keep_raw_vcf              Save the unfiltered VCF file i.e. direct output of `bcftools call`; can be combined with 
+                                     --only_report_alts=false to report all (unfiltered, REF and ALT) variants; 
+                                     only relevant when --skip_filtering=false; default = false
+        --keep_sorted_bam           Save the mapping file (sorted BAM); default = false
+
+    iRODS exractor opttions:
+        --save_metadata             Save the metadata to the results directory that is returned from IRODS (default: true)
+        --save_fastqs               Save the fastq files to the results directory after unpacking data from CRAM files (default: false)
+        --save_method               Structure of the fastq save directory. 'flat' saves all fastq files into one directory; 'nested' saves them into sample-specific directories. (default: nested)
+        --raw_reads_prefix          Prefix for unpacked reads i.e. 'raw_' prefix makes files named like 'raw_251312_1#195_1.fastq.gz' default is no prefix
     """.stripIndent()
 }
 
