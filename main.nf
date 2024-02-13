@@ -6,7 +6,15 @@
 ========================================================================================
 */
 
+<<<<<<< HEAD
 def logo = NextflowTool.logo(workflow, params.monochrome_logs)
+=======
+/*
+def printHelp() {
+    log.info """
+    Usage:
+    nextflow run main.nf [--manifest_of_reads <path to manifest>] [--manifest_of_lanes <path to manifest>] [--studyid <study_id>, [--runid <run_id>, [--laneid <lane_id>, [--plexid <plex_id>]]]] --reference <path to reference> --outdir <path to results folder>
+>>>>>>> b4dc594 (change to schema-based help message and comment out deprecated functions in main)
 
 log.info logo
 
@@ -25,7 +33,7 @@ if (params.help) {
     VALIDATE INPUTS
 ========================================================================================
 */
-
+/*
 def validate_path_param(
     param_option, 
     param, 
@@ -72,6 +80,7 @@ def validate_parameters() {
         exit 1
     }
 }
+*/
 
 //validate_parameters()
 
@@ -80,6 +89,20 @@ def validate_parameters() {
     IMPORT MODULES/SUBWORKFLOWS
 ========================================================================================
 */
+
+def logo = NextflowTool.logo(workflow, params.monochrome_logs)
+
+log.info logo
+
+
+def printHelp() {
+    NextflowTool.help_message("${workflow.ProjectDir}/schema.json", 
+                               ["${workflow.ProjectDir}/assorted-sub-workflows/combined_input/schema.json",
+                                "${workflow.ProjectDir}/assorted-sub-workflows/irods_extractor/schema.json",
+                                "${workflow.ProjectDir}/assorted-sub-workflows/strain_mapper/schema.json"],
+    params.monochrome_logs, log)
+}
+
 
 //
 // SUBWORKFLOWS
@@ -97,6 +120,10 @@ include { STRAIN_MAPPER   } from './assorted-sub-workflows/strain_mapper/strain_
 */
 
 workflow {
+    if (params.help) {
+        printHelp()
+        exit 0
+    }
 
     //
     // REFERENCE PROCESSING 
@@ -125,7 +152,10 @@ workflow {
 workflow.onComplete {
         NextflowTool.summary(workflow, params, log)
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> b4dc594 (change to schema-based help message and comment out deprecated functions in main)
 /*
 ========================================================================================
     THE END
