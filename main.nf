@@ -6,15 +6,7 @@
 ========================================================================================
 */
 
-<<<<<<< HEAD
 def logo = NextflowTool.logo(workflow, params.monochrome_logs)
-=======
-/*
-def printHelp() {
-    log.info """
-    Usage:
-    nextflow run main.nf [--manifest_of_reads <path to manifest>] [--manifest_of_lanes <path to manifest>] [--studyid <study_id>, [--runid <run_id>, [--laneid <lane_id>, [--plexid <plex_id>]]]] --reference <path to reference> --outdir <path to results folder>
->>>>>>> b4dc594 (change to schema-based help message and comment out deprecated functions in main)
 
 log.info logo
 
