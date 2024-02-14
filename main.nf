@@ -144,10 +144,6 @@ workflow {
 workflow.onComplete {
         NextflowTool.summary(workflow, params, log)
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> b4dc594 (change to schema-based help message and comment out deprecated functions in main)
 /*
 ========================================================================================
     THE END
