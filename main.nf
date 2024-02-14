@@ -10,15 +10,15 @@ def logo = NextflowTool.logo(workflow, params.monochrome_logs)
 
 log.info logo
 
-def printHelp()  {
-    NextflowTool.help_message("${workflow.ProjectDir}/schema.json", ["${workflow.ProjectDir}/assorted-sub-workflows/irods_extractor/schema.json"],
+
+def printHelp() {
+    NextflowTool.help_message("${workflow.ProjectDir}/schema.json", 
+                               ["${workflow.ProjectDir}/assorted-sub-workflows/combined_input/schema.json",
+                                "${workflow.ProjectDir}/assorted-sub-workflows/irods_extractor/schema.json",
+                                "${workflow.ProjectDir}/assorted-sub-workflows/strain_mapper/schema.json"],
     params.monochrome_logs, log)
 }
 
-if (params.help) {
-    printHelp()
-    exit(0)
-}
 
 /*
 ========================================================================================
@@ -81,20 +81,6 @@ def validate_parameters() {
     IMPORT MODULES/SUBWORKFLOWS
 ========================================================================================
 */
-
-def logo = NextflowTool.logo(workflow, params.monochrome_logs)
-
-log.info logo
-
-
-def printHelp() {
-    NextflowTool.help_message("${workflow.ProjectDir}/schema.json", 
-                               ["${workflow.ProjectDir}/assorted-sub-workflows/combined_input/schema.json",
-                                "${workflow.ProjectDir}/assorted-sub-workflows/irods_extractor/schema.json",
-                                "${workflow.ProjectDir}/assorted-sub-workflows/strain_mapper/schema.json"],
-    params.monochrome_logs, log)
-}
-
 
 //
 // SUBWORKFLOWS
