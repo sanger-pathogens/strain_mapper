@@ -9,7 +9,7 @@
         }
     },
     "overwrite_param": {
-        "irods_params": {
+        "none": {
         }
     }
 }
