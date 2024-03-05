@@ -6,6 +6,7 @@
 ========================================================================================
 */
 
+<<<<<<< HEAD
 def printHelp() {
     log.info """
     Usage:
@@ -152,14 +153,20 @@ def validate_parameters() {
         log.error(String.format("No input provided; please specify at least one of the following options: --manifest_of_reads, --manifest_of_lanes or --studyid", errors))
         errors += 1
     }
+=======
+def logo = NextflowTool.logo(workflow, params.monochrome_logs)
 
-    if (errors > 0) {
-        log.error(String.format("%d errors detected", errors))
-        exit 1
-    }
+log.info logo
+
+>>>>>>> master
+
+def printHelp() {
+    NextflowTool.help_message("${workflow.ProjectDir}/schema.json", 
+                               ["${workflow.ProjectDir}/assorted-sub-workflows/combined_input/schema.json",
+                                "${workflow.ProjectDir}/assorted-sub-workflows/irods_extractor/schema.json",
+                                "${workflow.ProjectDir}/assorted-sub-workflows/strain_mapper/schema.json"],
+    params.monochrome_logs, log)
 }
-
-//validate_parameters()
 
 /*
 ========================================================================================
@@ -170,10 +177,10 @@ def validate_parameters() {
 //
 // SUBWORKFLOWS
 //
-include { INPUT_CHECK } from './subworkflows/input_check'
-include { STRAIN_MAPPER } from './assorted-sub-workflows/strain_mapper/strain_mapper.nf'
+include { COMBINE_IRODS ; 
+          COMBINE_READS   } from './assorted-sub-workflows/combined_input/subworkflows/combined_input.nf'
 include { IRODS_EXTRACTOR } from './assorted-sub-workflows/irods_extractor/subworkflows/irods.nf'
-include { IRODS_MANIFEST_PARSE } from './assorted-sub-workflows/irods_extractor/subworkflows/irods_manifest_parse.nf'
+include { STRAIN_MAPPER   } from './assorted-sub-workflows/strain_mapper/strain_mapper.nf'
 
 
 /*
@@ -183,6 +190,10 @@ include { IRODS_MANIFEST_PARSE } from './assorted-sub-workflows/irods_extractor/
 */
 
 workflow {
+    if (params.help) {
+        printHelp()
+        exit 0
+    }
 
     //
     // REFERENCE PROCESSING 
@@ -192,21 +203,11 @@ workflow {
     //
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
     //
-    if (params.manifest_of_reads) {
-        input_reads_ch = file(params.manifest_of_reads)
-        INPUT_CHECK (
-            input_reads_ch
-        )
-        INPUT_CHECK.out.shortreads
-            .dump(tag: 'ch_reads_from_manifest')
-            .set { ch_reads_from_manifest }
-    } else {
-        Channel.of("none").set{ ch_reads_from_manifest }
-    }
-    //
-    // SUBWORKFLOW: Read in study, run, etc. parameters and pull data from iRODS
-    //
+    COMBINE_IRODS
+    | IRODS_EXTRACTOR
+    | COMBINE_READS
 
+<<<<<<< HEAD
     // take iRODS dataset specification from CLI options
     if (params.studyid > 0) {
         param_input = Channel.of(["${params.studyid}", "${params.runid}", "${params.laneid}", "${params.plexid}"])
@@ -248,6 +249,9 @@ workflow {
 
     // combine reads input channels
     irods_ready_to_map_ch.mix(ch_reads_from_manifest.filter{ it != "none"}).set{ all_reads_ready_to_map_ch }
+=======
+    COMBINE_READS.out.all_reads_ready_to_map_ch.set{ all_reads_ready_to_map_ch }
+>>>>>>> master
 
     //
     // SUBWORKFLOW: actual processing; 
@@ -257,6 +261,10 @@ workflow {
 
     STRAIN_MAPPER( all_reads_ready_to_map_ch, reference )
 
+}
+
+workflow.onComplete {
+        NextflowTool.summary(workflow, params, log)
 }
 /*
 ========================================================================================
