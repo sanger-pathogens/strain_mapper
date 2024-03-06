@@ -4,7 +4,13 @@
         "Logging options": {
             "monochrome_logs": {
                 "default": "false",
-                "help_text": "Should logs appear in plain ASCII"
+                "help_text": "If true, logs appear in plain ASCII"
+            }
+        },
+        "Output options": {
+            "outdir": {
+                "default": "./results",
+                "help_text": "Specify the pipeline output directory"
             }
         }
     },
