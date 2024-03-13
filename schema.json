@@ -1,0 +1,21 @@
+{ 
+    "pipeline": "Strain Mapper",
+    "params": {
+        "Logging options": {
+            "monochrome_logs": {
+                "default": "false",
+                "help_text": "If true, logs appear in plain ASCII"
+            }
+        },
+        "Output options": {
+            "outdir": {
+                "default": "./results",
+                "help_text": "Specify the pipeline output directory"
+            }
+        }
+    },
+    "overwrite_param": {
+        "none": {
+        }
+    }
+}
