@@ -66,8 +66,9 @@ workflow {
     // in the submodule repository assorted-sub-workflows
     //
 
-    STRAIN_MAPPER( all_reads_ready_to_map_ch, reference )
-
+    if (!params.metadata_only) {
+        STRAIN_MAPPER( all_reads_ready_to_map_ch, reference )
+    }
 }
 
 workflow.onComplete {
