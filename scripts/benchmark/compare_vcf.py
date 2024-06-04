@@ -161,24 +161,24 @@ def parse_args():
         "--vcf1",
         "-1",
         default="/lustre/scratch126/pam/teams/team230/sd28/test/mm2b_no_indel/31663_7#10_BWA/31663_7#10_variant.vcf",
-        help="VCF file for variants called by the first method"
+        help="VCF file for variants called by the first method",
     )
     parser.add_argument(
         "--vcf2",
         "-2",
-        default="/lustre/scratch126/pam/teams/team230/sd28/strain_mapper/results/31663_7#10/final_vcf/31663_7#10.vcf"
-        help="VCF file for variants called by the second method"
+        default="/lustre/scratch126/pam/teams/team230/sd28/strain_mapper/results/31663_7#10/final_vcf/31663_7#10.vcf",
+        help="VCF file for variants called by the second method",
     )
     parser.add_argument(
         "--method1",
         "-m",
-        default='mm2b_no_indel'
+        default='mm2b_no_indel',
         help="Label for first variant calling method",
     )
     parser.add_argument(
         "--method2",
         "-M",
-        default='BWA_new_SM'
+        default='BWA_new_SM',
         help="Label for second variant calling method",
     )
     return parser.parse_args()
