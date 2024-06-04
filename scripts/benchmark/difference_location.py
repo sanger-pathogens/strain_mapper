@@ -135,7 +135,4 @@ if __name__ == "__main__":
 
     fraction_agreement, base_counts = calculate_alignment_stats(seq1, seq2)
 
-    tool1_counts = count_bases_in_fasta(args.fasta1)
-    tool2_counts = count_bases_in_fasta(args.fasta2)
-
     plot_stats(base_counts, fraction_agreement, base_counts['mismatch_types'], base_counts['mismatch_indices'], [args.method1, args.method2], seq1, seq2)
