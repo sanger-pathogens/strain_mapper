@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
+import argparse
 import pysam
 import matplotlib.pyplot as plt
 import numpy as np
 
 class Variant:
-    def __init__(self, record):
+    def __init__(self, record, method_label=None):
         self.chrom = record.chrom
         self.pos = record.pos
         self.ref = record.ref
@@ -16,6 +17,7 @@ class Variant:
         self.dp = record.info.get('DP', None)
         self.vdb = record.info.get('VDB', 0.0)
         self.info = record.info
+        self.method_label = method_label
 
     def __eq__(self, other):
         return (
@@ -39,12 +41,12 @@ class Variant:
 
 
 # Step 1: Read VCF files and parse into Variant objects
-def read_vcf(vcf_file):
+def read_vcf(vcf_file, method_label=None):
     variants = []
     with pysam.VariantFile(vcf_file) as vcf_reader:
         for record in vcf_reader:
             if record.alts:
-                variants.append(Variant(record))
+                variants.append(Variant(record, method_label=method_label))
     return variants
 
 def is_transition(base_change):
@@ -105,9 +107,9 @@ def plot_info_histograms(variant_list, outname):
     plt.savefig(f"{outname}.jpg")
 
 # Step 2: Compare true VCF to method VCF
-def compare_vcf(true_vcf, method_vcf):
-    true_variants = read_vcf(true_vcf)
-    method_variants = read_vcf(method_vcf)
+def compare_vcf(true_vcf, method_vcf, method_labels=None):
+    true_variants = read_vcf(true_vcf, method_label=method_labels[0])
+    method_variants = read_vcf(method_vcf, method_label=method_labels[1])
 
     print("Number of true variants:", len(true_variants))
     print("Number of method variants:", len(method_variants))
@@ -122,7 +124,6 @@ def compare_vcf(true_vcf, method_vcf):
 
     true_positive = 0
     false_positive = 0
-
 
     # Perform comparison
     for method_variant in method_variants_same_position:
@@ -152,10 +153,6 @@ def compare_vcf(true_vcf, method_vcf):
 
     plot_info_histograms(method_variants_same_position, "vcf_all_histo")
 
-# Example usage for comparing one VCF against the true
-compare_vcf('/lustre/scratch126/pam/teams/team230/sd28/test/mm2b_no_indel/31663_7#10_BWA/31663_7#10_variant.vcf', '/lustre/scratch126/pam/teams/team230/sd28/strain_mapper/results/31663_7#10/final_vcf/31663_7#10.vcf')
-
-
 def parse_args():
     parser = argparse.ArgumentParser(
         description="Script to compare variants called from the same reference genome and read sets by two different methodologies"
@@ -164,13 +161,13 @@ def parse_args():
         "--vcf1",
         "-1",
         default="/lustre/scratch126/pam/teams/team230/sd28/test/mm2b_no_indel/31663_7#10_BWA/31663_7#10_variant.vcf",
-        help="VCF file for variants called by the first method",
+        help="VCF file for variants called by the first method"
     )
     parser.add_argument(
         "--vcf2",
         "-2",
         default="/lustre/scratch126/pam/teams/team230/sd28/strain_mapper/results/31663_7#10/final_vcf/31663_7#10.vcf"
-        help="VCF file for variants called by the second method",
+        help="VCF file for variants called by the second method"
     )
     parser.add_argument(
         "--method1",
@@ -189,8 +186,5 @@ def parse_args():
 if __name__ == "__main__":
 
     args = parse_args()
-
-    tool1_counts = count_bases_in_fasta(args.fasta1)
-    tool2_counts = count_bases_in_fasta(args.fasta2)
     
-    plot_base_counts(tool1_counts, tool2_counts, [args.method1, args.method2])
+    compare_vcf(args.vcf1, args.vcf2, [args.method1, args.method2])
