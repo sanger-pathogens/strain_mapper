@@ -2,4 +2,4 @@
 
 THIS_DIR=$(dirname -- "${BASH_SOURCE[0]}")
 
-${THIS_DIR}/main.nf
+nextflow run ${THIS_DIR}/main.nf
