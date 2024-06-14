@@ -8,4 +8,4 @@ source "${PATHOGEN_APPLICATIONS}"
 
 track_usage "$THIS_APP_AND_VERSION" "$THIS_SCRIPT" "${@:1:25}"
 
-nextflow run ${THIS_DIR}/main.nf
+nextflow run ${THIS_DIR}/main.nf ${@:1}
