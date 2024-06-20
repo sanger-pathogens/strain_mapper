@@ -7,6 +7,7 @@ conda create -n plotlibs matplotlib pysam biopython
 ```
 
 ### Usage
+
 ```
 conda activate plotlibs
 python3 strain_mapper/scripts/benchmark/compare_consensus.py \
