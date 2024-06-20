@@ -1,0 +1,12 @@
+stages:
+  - before_build
+
+include:
+  - project: "sanger-pathogens/templates/ci-templates"
+    ref: "PAT-2100/CI_templates_for_pipeline_deployment_on_farm"
+    file: "before-build-template.yml"
+
+# before-build-template jobs: do not need js linting
+eslint:
+  rules:
+    - when: never
