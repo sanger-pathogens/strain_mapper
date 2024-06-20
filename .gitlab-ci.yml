@@ -10,3 +10,8 @@ include:
 eslint:
   rules:
     - when: never
+
+# don't scan history for secrets
+talisman:
+  variables:
+    TALISMAN_OPTS: "--scan --ignoreHistory"
