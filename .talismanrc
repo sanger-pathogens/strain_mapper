@@ -1,4 +1,5 @@
+threshold: medium
 fileignoreconfig:
-- filename: scripts/benchmark/difference_location.py
-  checksum: 8f4d7ff0c0441002806dd6bf666ad3ea156ab4a3736dbf079ebf4c55532d2d2a
+  - filename: scripts/benchmark/difference_location.py
+    checksum: 8f4d7ff0c0441002806dd6bf666ad3ea156ab4a3736dbf079ebf4c55532d2d2a
 version: ""
