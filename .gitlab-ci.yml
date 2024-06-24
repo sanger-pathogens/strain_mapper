@@ -22,6 +22,6 @@ talisman:
 
 deploy_to_farm:
   variables:
-    TOOL: "strain-mapper" # project name has underscore, name as deployed on farm has hyphen
+    FARM_NAME: "strain-mapper" # project name has underscore, name as deployed on farm has hyphen
     # TODO the install path below is a temporary test deployment directory
-    INSTALL_PATH: "/data/pam/applications/farm-etc-testing/PAT-2100_testing_installs"
+    FARM_PATH: "/data/pam/applications/farm-etc-testing/PAT-2100_testing_installs"
