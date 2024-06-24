@@ -1,10 +1,14 @@
 stages:
   - before_build
+  - deploy
 
 include:
   - project: "sanger-pathogens/templates/ci-templates"
     ref: "PAT-2100/CI_templates_for_pipeline_deployment_on_farm"
     file: "before-build-template.yml"
+  - project: "sanger-pathogens/templates/ci-templates"
+    ref: "PAT-2100/CI_templates_for_pipeline_deployment_on_farm"
+    file: "farm22/farm-deploy.yml"
 
 # before-build-template jobs: do not need js linting
 eslint:
@@ -15,3 +19,8 @@ eslint:
 talisman:
   variables:
     TALISMAN_OPTS: "--scan --ignoreHistory"
+
+deploy_to_farm:
+  variables:
+    # TODO the install path below is a temporary test deployment directory
+    INSTALL_PATH: "/data/pam/applications/farm-etc-testing/PAT-2100_testing_installs"
