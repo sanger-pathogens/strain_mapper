@@ -21,9 +21,5 @@ talisman:
 deploy_to_farm:
   variables:
     FARM_NAME: "strain-mapper"
-    # TODO the install path below is a temporary test deployment directory
-    FARM_PATH: "/data/pam/applications/farm-etc-testing/PAT-2100_testing_installs"
     FARM_FILE_CHMOD: "[strain-mapper.sh]='+x' [main.nf]='+x'"
     FARM_FILE_RENAME: "[strain-mapper.sh]='strain-mapper'"
-    # TODO the module path below is a temporary test directory
-    FARM_MODULE_PATH: "/data/pam/applications/farm-etc-testing/PAT-2100_testing_installs/modules/"
