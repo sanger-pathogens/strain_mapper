@@ -18,7 +18,7 @@ talisman:
   variables:
     TALISMAN_OPTS: "--scan --ignoreHistory"
 
-deploy_to_farm:
+.deploy_to_farm:
   variables:
     FARM_NAME: "strain-mapper"
     FARM_FILE_CHMOD: "[strain-mapper.sh]='+x' [main.nf]='+x'"
