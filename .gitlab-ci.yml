@@ -23,12 +23,3 @@ talisman:
     FARM_NAME: "strain-mapper"
     FARM_FILE_CHMOD: "[strain-mapper.sh]='+x' [main.nf]='+x'"
     FARM_FILE_RENAME: "[strain-mapper.sh]='strain-mapper'"
-
-deploy_to_farm_ALL_TAGS:
-  extends:
-    - .deploy_to_farm
-    - .rules_for_matching_tags
-  variables:
-    TAG_PATTERN: "."
-    # TODO path below is a temporary test deployment directory
-    FARM_PATH: "${FARM_APP_ROOT}/applications/farm-etc-testing/PAT-2100_testing_installs"
