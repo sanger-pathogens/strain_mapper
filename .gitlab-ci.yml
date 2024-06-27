@@ -8,7 +8,7 @@ include:
     file: "before-build-template.yml"
   - project: "sanger-pathogens/templates/ci-templates"
     ref: "PAT-2100/CI_templates_for_pipeline_deployment_on_farm"
-    file: "farm22/farm-deploy.yml"
+    file: "farm22/pipeline-deploy.yml"
 
 eslint:
   rules:
@@ -18,7 +18,7 @@ talisman:
   variables:
     TALISMAN_OPTS: "--scan --ignoreHistory"
 
-.deploy_to_farm:
+.pipeline_deploy_to_farm:
   variables:
     FARM_NAME: "strain-mapper"
     FARM_FILE_CHMOD: "[strain-mapper.sh]='+x' [main.nf]='+x'"
