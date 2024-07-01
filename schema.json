@@ -1,14 +1,15 @@
-{
-  "pipeline": "Strain Mapper",
-  "params": {
-    "Logging options": {
-      "monochrome_logs": {
-        "default": "false",
-        "help_text": "Should logs appear in plain ASCII"
-      }
+{ 
+    "pipeline": "Strain Mapper",
+    "params": {
+        "Logging options": {
+            "monochrome_logs": {
+                "default": "false",
+                "help_text": "Should logs appear in plain ASCII"
+            }
+        }
+    },
+    "overwrite_param": {
+        "none": {
+        }
     }
-  },
-  "overwrite_param": {
-    "none": {}
-  }
 }
