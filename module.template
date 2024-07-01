@@ -1,0 +1,35 @@
+#%Module1.0#####################################################################
+##
+## Parasites and Microbes strain-mapper {{version}}
+##
+
+# help setup
+proc ModulesHelp { } {
+  global version modroot
+
+  puts stderr "Custom deployment managed by pathogen informatics: {{path}}"
+  puts stderr "Executables:"
+  puts stderr "\tstrain-mapper"
+  puts stderr "Home page: https://gitlab.internal.sanger.ac.uk/sanger-pathogens/pipelines/strain_mapper/"
+}
+
+# Whatis setup
+module-whatis "Custom deployment managed by pathogen informatics: {{path}}"
+module-whatis "Executables:"
+module-whatis "strain-mapper"
+
+# Load prerequisite modules
+module switch nextflow
+module switch ISG/singularity
+
+# Load message
+if { [ module-info mode load ] } {
+    puts stderr "\tModule loaded. For more information run 'module help strain-mapper/{{version}}' or check https://ssg-confluence.internal.sanger.ac.uk/display/PaMI/Strain+mapper+read+mapping+pipeline."
+}
+
+# Conflicts
+conflict strain-mapper
+
+# Add wrappers to PATH
+prepend-path PATH "{{path}}/strain-mapper"
+prepend-path PATH "{{path}}/strain-mapper/scripts"
