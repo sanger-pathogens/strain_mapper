@@ -5,7 +5,7 @@ THIS_SCRIPT=$(basename -- ${BASH_SOURCE[0]})
 THIS_APP_AND_VERSION=$(cd -- "$THIS_DIR" &> /dev/null && pwd | rev | cut -d'/' -f2,3 | rev )
 
 if [[ ! -s "$PATHOGEN_APPLICATIONS" ]]; then
-    echo "Enviroment variable PATHOGEN_APPLICATIONS is undefined or refers to a file that does not exist" 1>&2
+    echo "Environment variable PATHOGEN_APPLICATIONS is undefined or refers to a file that does not exist" 1>&2
     exit 255
 fi
 
