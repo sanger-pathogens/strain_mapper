@@ -5,3 +5,7 @@ results/
 .DS_Store
 test*
 *.pyc
+.gitlab-ci-local
+.gitlab-ci-local-variables.yml
+.gitlab-ci-local-env
+talisman_report
