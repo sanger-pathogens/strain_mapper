@@ -18,6 +18,10 @@ talisman:
   variables:
     TALISMAN_OPTS: "--scan --ignoreHistory"
 
+pipeline_deploy_to_farm_prod:
+  variables:
+    TAG_PATTERN: /^v[0-9]+\.[0-9]+\.[0-9]+/
+
 .pipeline_deploy_to_farm:
   variables:
     FARM_NAME: "strain-mapper"
