@@ -1,0 +1,30 @@
+stages:
+  - before_build
+  - deploy
+
+include:
+  - project: "sanger-pathogens/templates/ci-templates"
+    ref: "v0.10.1"
+    file: "before-build-template.yml"
+  - project: "sanger-pathogens/templates/ci-templates"
+    ref: "v0.10.1"
+    file: "farm22/pipeline-deploy.yml"
+
+eslint:
+  rules:
+    - when: never
+
+talisman:
+  variables:
+    TALISMAN_OPTS: "--scan --ignoreHistory"
+
+pipeline_deploy_to_farm_prod:
+  variables:
+    TAG_PATTERN: /^v[0-9]+\.[0-9]+\.[0-9]+/
+
+.pipeline_deploy_to_farm:
+  variables:
+    FARM_NAME: "strain-mapper"
+    FARM_FILE_CHMOD: "[strain-mapper.sh]='+x' [main.nf]='+x'"
+    FARM_FILE_SED: "[main.nf]='s/nextflow +run +(.|main.nf)/${FARM_NAME}/'"
+    FARM_FILE_RENAME: "[strain-mapper.sh]='strain-mapper'"

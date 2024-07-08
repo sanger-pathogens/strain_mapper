@@ -21,6 +21,8 @@ EOT
 # validate file paths
 validate_filepath () {
     if [[ -f $1 ]]; then
+      # FIXME path_valid isn't used
+      # shellcheck disable=SC2034
       path_valid=true
     else
       echo "$1 is not a valid filepath!" >&2
@@ -39,6 +41,7 @@ do
       l) lanes_file="${OPTARG}";;
       m) manifest_file="${OPTARG}";;
       h) usage; exit 0;;
+      *) echo "Unrecognised option ${OPTARG} will be ignored" 1>&2
     esac
 done
 
@@ -65,7 +68,7 @@ do
   read_2=$(grep -w "${lane}_2.fastq.gz" Temp_file_path.txt)
   if [[ ! -z ${read_1} ]] || [[ ! -z ${read_2} ]]
   then
-      echo ${lane}","${read_1}","${read_2} >> ${manifest_file}
+      echo "${lane},${read_1},${read_2}" >> ${manifest_file}
   else
       echo "No data available for ${lane}, skipping..."
   fi

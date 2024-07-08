@@ -23,11 +23,13 @@ All relevant intermediate files are currently published in process-specific dire
 ### Running on the farm (Sanger HPC clusters)
 
 1. Load nextflow and singularity modules:
+
    ```bash
    module load nextflow ISG/singularity
    ```
 
 2. Clone the repo:
+
    ```bash
    git clone --recurse-submodules git@gitlab.internal.sanger.ac.uk:sanger-pathogens/pipelines/strain_mapper.git
    cd strain_mapper
@@ -37,11 +39,13 @@ All relevant intermediate files are currently published in process-specific dire
    For example input, please see [Generating a manifest](#generating-a-manifest).
 
    Example:
+
    ```bash
    nextflow run . --input ./test_data/inputs/test_manifest.csv --reference ./test_data/ref/test_ref.fna --outdir my_output
    ```
 
    It is good practice to submit a dedicated job for the nextflow master process (use the `oversubscribed` queue):
+
    ```bash
    bsub -o output.o -e error.e -q oversubscribed -R "select[mem>4000] rusage[mem=4000]" -M4000 nextflow run . --input ./test_data/inputs/test_manifest.csv --reference ./test_data/ref/test_ref.fna --outdir my_output
    ```
@@ -63,7 +67,7 @@ ID,R1,R2
 test_id,./test_data/inputs/test_1.fastq.gz,./test_data/inputs/test_2.fastq.gz
 ```
 
-Where column `ID` can be an arbitrary sample identifier, `R1` is a .fastq.gz file of forward reads, `R2` is the mate .fastq.gz file containing reverse reads. 
+Where column `ID` can be an arbitrary sample identifier, `R1` is a .fastq.gz file of forward reads, `R2` is the mate .fastq.gz file containing reverse reads.
 
 Scripts have been developed to generate manifests appropriate for this pipeline:
 
@@ -72,7 +76,6 @@ Scripts have been developed to generate manifests appropriate for this pipeline:
 - To generate a manifest from a file of custom .fastq.gz paths, use [this script](./scripts/generate_manifest.sh).
 
 Please run `--help` on these scripts for more information on script usage.
-
 
 ## Usage
 
@@ -122,6 +125,7 @@ General options:
   --help_all                   Print extensive list of parameters and options (optional)
     --help                       Print this help message (optional)
 ```
+
 ## Default filtering
 
 By default filtering removes records below 50 quality score and ensures that they are represented on at least 3 forward and reverse reads. In addition there must be more than 8 reads in total supporting this variant call.
