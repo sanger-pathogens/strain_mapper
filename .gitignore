@@ -5,3 +5,7 @@ results/
 .DS_Store
 test*
 *.pyc
+*.fa
+*.log
+*.csv
+*.txt
