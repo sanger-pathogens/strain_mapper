@@ -4,10 +4,10 @@ stages:
 
 include:
   - project: "sanger-pathogens/templates/ci-templates"
-    ref: "v0.10"
+    ref: "v0.10.1"
     file: "before-build-template.yml"
   - project: "sanger-pathogens/templates/ci-templates"
-    ref: "v0.10"
+    ref: "v0.10.1"
     file: "farm22/pipeline-deploy.yml"
 
 eslint:
