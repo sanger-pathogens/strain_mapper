@@ -10,6 +10,8 @@ def logo = NextflowTool.logo(workflow, params.monochrome_logs)
 
 log.info logo
 
+NextflowTool.commandLineParams(workflow.commandLine, log, params.monochrome_logs)
+
 
 def printHelp() {
     NextflowTool.help_message("${workflow.ProjectDir}/schema.json", 
