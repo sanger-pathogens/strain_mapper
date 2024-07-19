@@ -31,7 +31,7 @@ pipeline_deploy_to_farm_prod:
   variables:
     FARM_NAME: "strain-mapper"
     FARM_FILE_CHMOD: "[strain-mapper.sh]='+x' [main.nf]='+x'"
-    FARM_FILE_SED: "[main.nf]='s/nextflow +run +(.|main.nf)/${FARM_NAME}/'"
+    FARM_FILE_SED: "[main.nf]='s/nextflow +run +(.|main.nf)/${FARM_NAME}/' [nextflow.config]='s/\\{\\{strain_mapper_version\\}\\}/${CI_COMMIT_REF_NAME}/'"
     FARM_FILE_RENAME: "[strain-mapper.sh]='strain-mapper'"
 
 # there's no docker build in this repo so disable container scan
