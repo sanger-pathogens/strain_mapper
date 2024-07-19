@@ -12,8 +12,6 @@
 
 **strain_mapper** maps short read sequences to a given reference genome using bowtie2. It generates a VCF containing genotype likelihoods for the alignment using `bcftools mpileup` and subsequently uses `bcftools call` to call the variants. This variant information is then used to create a consensus sequence based on the mapped reads.
 
-The pipeline assumes that the largest sequence in the `--reference` is bacteria's chromosome and will only generate a consensus sequence for this sequence.
-
 The pipeline will build reference and bowtie2 indexes if it doesn't find them in the same directory as the supplied `--reference`.
 
 All relevant intermediate files are currently published in process-specific directories within the supplied `--output` directory.
