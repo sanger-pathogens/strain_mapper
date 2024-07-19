@@ -1,14 +1,19 @@
 stages:
   - before_build
   - deploy
+  - security_scans
+  - after_security_scans
 
 include:
   - project: "sanger-pathogens/templates/ci-templates"
-    ref: "v0.10.1"
+    ref: "$CI_CD_TEMPLATES_LATEST_STABLE"
     file: "before-build-template.yml"
   - project: "sanger-pathogens/templates/ci-templates"
-    ref: "v0.10.1"
+    ref: "$CI_CD_TEMPLATES_LATEST_STABLE"
     file: "farm22/pipeline-deploy.yml"
+  - project: "sanger-pathogens/templates/ci-templates"
+    ref: "$CI_CD_TEMPLATES_LATEST_STABLE"
+    file: "security-scans-standard-template.yml"
 
 eslint:
   rules:
@@ -28,3 +33,8 @@ pipeline_deploy_to_farm_prod:
     FARM_FILE_CHMOD: "[strain-mapper.sh]='+x' [main.nf]='+x'"
     FARM_FILE_SED: "[main.nf]='s/nextflow +run +(.|main.nf)/${FARM_NAME}/'"
     FARM_FILE_RENAME: "[strain-mapper.sh]='strain-mapper'"
+
+# there's no docker build in this repo so disable container scan
+container_scanning:
+  rules:
+    - when: never
