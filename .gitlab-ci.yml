@@ -6,13 +6,13 @@ stages:
 
 include:
   - project: "sanger-pathogens/templates/ci-templates"
-    ref: "stop_security_scan_artifact_overwriting"
+    ref: "$CI_CD_TEMPLATES_LATEST_STABLE"
     file: "before-build-template.yml"
   - project: "sanger-pathogens/templates/ci-templates"
-    ref: "stop_security_scan_artifact_overwriting"
+    ref: "$CI_CD_TEMPLATES_LATEST_STABLE"
     file: "farm22/pipeline-deploy.yml"
   - project: "sanger-pathogens/templates/ci-templates"
-    ref: "stop_security_scan_artifact_overwriting"
+    ref: "$CI_CD_TEMPLATES_LATEST_STABLE"
     file: "security-scans-standard-template.yml"
 
 eslint:
