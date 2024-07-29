@@ -10,7 +10,7 @@ proc ModulesHelp { } {
   puts stderr "Custom deployment managed by pathogen informatics: {{path}}"
   puts stderr "Executables:"
   puts stderr "\tstrain-mapper"
-  puts stderr "Home page: https://gitlab.internal.sanger.ac.uk/sanger-pathogens/pipelines/strain_mapper/"
+  puts stderr "Home page: {{repo_url}}"
 }
 
 # Whatis setup
