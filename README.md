@@ -39,13 +39,13 @@ All relevant intermediate files are currently published in process-specific dire
    Example:
 
    ```bash
-   nextflow run . --input ./test_data/inputs/test_manifest.csv --reference ./test_data/ref/test_ref.fna --outdir my_output
+   nextflow run . --manifest_of_reads ./test_data/inputs/new_manifest.csv --reference ./test_data/inputs/ref/GCF_000011265.1.fna --outdir my_output
    ```
 
    It is good practice to submit a dedicated job for the nextflow master process (use the `oversubscribed` queue):
 
    ```bash
-   bsub -o output.o -e error.e -q oversubscribed -R "select[mem>4000] rusage[mem=4000]" -M4000 nextflow run . --input ./test_data/inputs/test_manifest.csv --reference ./test_data/ref/test_ref.fna --outdir my_output
+   bsub -o output.o -e error.e -q oversubscribed -R "select[mem>4000] rusage[mem=4000]" -M4000 nextflow run . --manifest_of_reads ./test_data/inputs/new_manifest.csv --reference ./test_data/inputs/ref/GCF_000011265.1.fna --outdir my_output
    ```
 
    See [usage](#usage) for all available pipeline options.
@@ -58,7 +58,7 @@ All relevant intermediate files are currently published in process-specific dire
 
 ## Generating a manifest
 
-Manifests supplied as an argument to `--input` should be of of the following format:
+Manifests supplied as an argument to `--manifest_of_reads` should be of of the following format:
 
 ```console
 ID,R1,R2
