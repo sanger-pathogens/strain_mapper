@@ -6,7 +6,7 @@
 
 ## Introduction
 
-**strain_mapper** is a pipeline for mapping short read sequences of single chromosome bacteria to a given reference.
+**strain_mapper** is a pipeline for mapping short read sequences of bacteria to a given reference.
 
 ## Pipeline summary
 
@@ -14,7 +14,7 @@
 
 The pipeline will build reference and bowtie2 indexes if it doesn't find them in the same directory as the supplied `--reference`.
 
-All relevant intermediate files are currently published in process-specific directories within the supplied `--output` directory.
+All relevant intermediate files are currently published in process-specific directories within the supplied `--outdir` directory.
 
 ## Getting started
 
@@ -126,15 +126,17 @@ General options:
 
 ## Default filtering
 
-By default filtering removes records below 50 quality score and ensures that they are represented on at least 3 forward and reverse reads. In addition there must be more than 8 reads in total supporting this variant call.
+By default, filtering marks as 'Pass' records that have a quality score of at least 50, are represented on at least 3 forward and reverse reads and are in a position covered by at least 8 reads. In addition, all multiallelic genotype calls (a.k.a. heterozygous calls if bacteria were diploid organisms) are marked as 'Het', meaning they are not included in the passing set of sites. Any site that does not pass is marked as 'LowQual' and is not included in the consensus sequence (will be represented as an N instead).
 
-To edit these please follow the documentation as seen on the BCFTOOLS view page under expressions:
+To edit these filters, please follow the documentation as seen on the BCFTOOLS view page under expressions:
 
 https://samtools.github.io/bcftools/bcftools.html#expressions
 
+Records that pass the above filters but have a heterozygous genotype (0/1) are marked as 'Het' and also not included in the consensus sequence.
+
 ## Output
 
-By default, only the final filtered variant (.vcf.gz) file and the curated consensus sequence (.fasta) will be returned. If you wish to retain the intermediate files such as the unfiltered VCF file or the sorted BAM files, please set the relevant parameters to `true` with `--keep_raw_vcf=true` and `--keep_sorted_bam=true`, respectively.
+You will find the variant (.vcf.gz) file and the curated consensus sequence (.fasta) for each sample under the corresponding sample directory within the supplied --outdir directory. If you also wish to retain the sorted BAM files, please use --keep_sorted_bam=true.
 
 ## Contributions and testing
 
