@@ -19,7 +19,7 @@ module-whatis "Executables:"
 module-whatis "strain-mapper"
 
 # Load prerequisite modules
-module switch nextflow
+module load nextflow
 module switch ISG/singularity
 
 # Load message
