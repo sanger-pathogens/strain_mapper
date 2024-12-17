@@ -15,7 +15,7 @@ NextflowTool.commandLineParams(workflow.commandLine, log, params.monochrome_logs
 
 def printHelp() {
     NextflowTool.help_message("${workflow.ProjectDir}/schema.json", 
-                               ["${workflow.ProjectDir}/assorted-sub-workflows/combined_input/schema.json",
+                               ["${workflow.ProjectDir}/assorted-sub-workflows/mixed_input/schema.json",
                                 "${workflow.ProjectDir}/assorted-sub-workflows/irods_extractor/schema.json",
                                 "${workflow.ProjectDir}/assorted-sub-workflows/strain_mapper/schema.json"],
     params.monochrome_logs, log)
@@ -30,10 +30,9 @@ def printHelp() {
 //
 // SUBWORKFLOWS
 //
-include { COMBINE_IRODS ; 
-          COMBINE_READS   } from './assorted-sub-workflows/combined_input/subworkflows/combined_input.nf'
-include { IRODS_EXTRACTOR } from './assorted-sub-workflows/irods_extractor/subworkflows/irods.nf'
-include { STRAIN_MAPPER   } from './assorted-sub-workflows/strain_mapper/strain_mapper.nf'
+include { MIXED_INPUT       } from './assorted-sub-workflows/mixed_input/mixed_input.nf'
+include { IRODS_EXTRACTOR   } from './assorted-sub-workflows/irods_extractor/subworkflows/irods.nf'
+include { STRAIN_MAPPER     } from './assorted-sub-workflows/strain_mapper/strain_mapper.nf'
 
 
 /*
@@ -56,11 +55,9 @@ workflow {
     //
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
     //
-    COMBINE_IRODS
-    | IRODS_EXTRACTOR
-    | COMBINE_READS
 
-    COMBINE_READS.out.all_reads_ready_to_map_ch.set{ all_reads_ready_to_map_ch }
+    MIXED_INPUT
+    | set{all_reads_ready_to_map_ch}
 
     //
     // SUBWORKFLOW: actual processing; 
@@ -69,7 +66,6 @@ workflow {
     //
 
     STRAIN_MAPPER( all_reads_ready_to_map_ch, reference )
-
 }
 
 workflow.onComplete {
