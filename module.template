@@ -20,7 +20,7 @@ module-whatis "strain-mapper"
 
 # Load prerequisite modules
 module load nextflow
-module switch ISG/singularity
+module load ISG/singularity
 
 # Load message
 if { [ module-info mode load ] } {
