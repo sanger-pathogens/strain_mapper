@@ -134,9 +134,9 @@ The pipeline applies stringent quality filters to ensure high-confidence consens
 
 - Read support:
 
-   - ≥3 forward reads (`INFO/ADF[0]`)
+  - ≥3 forward reads (`INFO/ADF[0]`)
 
-   - ≥3 reverse reads (`INFO/ADR[0]`)
+  - ≥3 reverse reads (`INFO/ADR[0]`)
 
 - Coverage: ≥8 total reads at position (`INFO/DP`)
 
@@ -159,6 +159,7 @@ To edit these filters, please follow the documentation as seen on the BCFTOOLS v
 https://samtools.github.io/bcftools/bcftools.html#expressions
 
 ### Unfiltered Mode (Advanced Use)
+
 When using --skip_filtering:
 
 - All variants are included regardless of:
