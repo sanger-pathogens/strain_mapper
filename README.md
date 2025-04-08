@@ -126,13 +126,55 @@ General options:
 
 ## Default filtering
 
-By default, filtering marks as 'Pass' records that have a quality score of at least 50, are represented on at least 3 forward and reverse reads and are in a position covered by at least 8 reads. In addition, all multiallelic genotype calls (a.k.a. heterozygous calls if bacteria were diploid organisms) are marked as 'Het', meaning they are not included in the passing set of sites. Any site that does not pass is marked as 'LowQual' and is not included in the consensus sequence (will be represented as an N instead).
+The pipeline applies stringent quality filters to ensure high-confidence consensus sequences:
+
+1. Quality Thresholds:
+
+- Minimum quality score: `≥50 (QUAL)`
+
+- Read support:
+
+  - ≥3 forward reads (`INFO/ADF[0]`)
+
+  - ≥3 reverse reads (`INFO/ADR[0]`)
+
+- Coverage: ≥8 total reads at position (`INFO/DP`)
+
+2. Genotype Requirements:
+
+- Only homozygous calls (`0/0 `or `1/1`) are included
+
+- All multiallelic/heterozygous calls (`0/1`) are marked as `'Het'` and excluded
+
+3. Filter Classification:
+
+- `'PASS'`: Meets all quality thresholds
+
+- `'Het'`: Passes quality but has heterozygous genotype (excluded)
+
+- `'LowQual'`: Fails one or more quality thresholds (excluded)
 
 To edit these filters, please follow the documentation as seen on the BCFTOOLS view page under expressions:
 
 https://samtools.github.io/bcftools/bcftools.html#expressions
 
-Records that pass the above filters but have a heterozygous genotype (0/1) are marked as 'Het' and also not included in the consensus sequence.
+### Unfiltered Mode (Advanced Use)
+
+When using --skip_filtering:
+
+- All variants are included regardless of:
+
+      - Quality scores
+      - Read depth
+      - Genotype (including heterozygous calls)
+
+- Results may contain:
+
+      - Lower-confidence variants
+      - More ambiguous positions
+      - Potential sequencing artifacts
+
+> **_NOTE_** Unfiltered mode is not recommended for standard consensus generation but may be useful for debugging or specialized analyses.
 
 ## Output
 
