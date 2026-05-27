@@ -112,6 +112,12 @@ Specify iRODS identifiers to stream reads directly from the Sanger iRODS system:
 
 Or provide a CSV manifest with iRODS identifiers via `--manifest_of_lanes`.
 
+**3. ENA download** — supply a file of ENA accession IDs via `--manifest_ena`. Set `--accession_type` to `run` (default), `sample`, or `study`.
+
+**4. Directory scan** — provide a path to a directory of FASTQ files via `--manifest_from_dir`. Use `--fastq_validation` (`strict`/`relaxed`, default: `strict`) and `--max_depth` (default: `0`) to control discovery.
+
+Run `--help` for the full parameter list.
+
 ### Output
 
 Results are written to `--outdir` (default: `./results`):
