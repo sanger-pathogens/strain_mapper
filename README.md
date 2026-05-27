@@ -110,11 +110,6 @@ Specify iRODS identifiers to stream reads directly from the Sanger iRODS system:
 
 Or provide a CSV manifest with iRODS identifiers via `--manifest_of_lanes`.
 
-Scripts for generating manifests are available in `scripts/`:
-
-- `scripts/generate_manifest_from_lanes.sh` — generates a manifest from a file of lane IDs.
-- `scripts/generate_manifest.sh` — generates a manifest from a directory of FASTQ files.
-
 ### Output
 
 Results are written to `--outdir` (default: `./results`):
