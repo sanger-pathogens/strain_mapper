@@ -100,6 +100,8 @@ sampleA,/path/to/sampleA_1.fastq.gz,/path/to/sampleA_2.fastq.gz
 sampleB,/path/to/sampleB_1.fastq.gz,/path/to/sampleB_2.fastq.gz
 ```
 
+**Sanger users:** the [manifest_generator](https://gitlab.internal.sanger.ac.uk/sanger-pathogens/pipelines/manifest_generator/) tool can generate a compatible `ID,R1,R2` manifest from a directory of FASTQ files or from iRODS.
+
 **2. iRODS manifest (`--manifest_of_lanes`) or study/run/lane/plex IDs**
 
 Specify iRODS identifiers to stream reads directly from the Sanger iRODS system:
