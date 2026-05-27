@@ -22,13 +22,13 @@ The pipeline performs the following steps:
 
 Default quality filters applied during variant filtering:
 
-| Filter | Threshold |
-| --- | --- |
-| Minimum quality (QUAL) | ≥ 50 |
-| Minimum forward strand reads (ADF[0]) | ≥ 3 |
-| Minimum reverse strand reads (ADR[0]) | ≥ 3 |
-| Minimum total depth (DP) | ≥ 8 |
-| Genotype | Homozygous only (0/0 or 1/1) |
+| Filter                                | Threshold                    |
+| ------------------------------------- | ---------------------------- |
+| Minimum quality (QUAL)                | ≥ 50                         |
+| Minimum forward strand reads (ADF[0]) | ≥ 3                          |
+| Minimum reverse strand reads (ADR[0]) | ≥ 3                          |
+| Minimum total depth (DP)              | ≥ 8                          |
+| Genotype                              | Homozygous only (0/0 or 1/1) |
 
 ## Usage
 
@@ -135,31 +135,31 @@ results/
 
 **Sequencing reads input**
 
-| Option | Type | Default | Description |
-| --- | --- | --- | --- |
-| `--manifest_of_reads` | `path` | `null` | Manifest CSV with header `ID,R1,R2` for local FASTQ input. |
-| `--manifest_of_lanes` | `path` | `null` | Manifest CSV with iRODS study/run/lane/plex IDs. |
-| `--studyid` | `string` | `null` | iRODS study ID. |
-| `--runid` | `string` | `null` | iRODS run ID. |
-| `--laneid` | `string` | `null` | iRODS lane ID. |
-| `--plexid` | `string` | `null` | iRODS plex ID. |
+| Option                | Type     | Default | Description                                                |
+| --------------------- | -------- | ------- | ---------------------------------------------------------- |
+| `--manifest_of_reads` | `path`   | `null`  | Manifest CSV with header `ID,R1,R2` for local FASTQ input. |
+| `--manifest_of_lanes` | `path`   | `null`  | Manifest CSV with iRODS study/run/lane/plex IDs.           |
+| `--studyid`           | `string` | `null`  | iRODS study ID.                                            |
+| `--runid`             | `string` | `null`  | iRODS run ID.                                              |
+| `--laneid`            | `string` | `null`  | iRODS lane ID.                                             |
+| `--plexid`            | `string` | `null`  | iRODS plex ID.                                             |
 
 ---
 
 **Reference**
 
-| Option | Type | Default | Description |
-| --- | --- | --- | --- |
-| `--reference` | `path` | `""` | Path to the reference FASTA file (mandatory). |
+| Option        | Type   | Default | Description                                   |
+| ------------- | ------ | ------- | --------------------------------------------- |
+| `--reference` | `path` | `""`    | Path to the reference FASTA file (mandatory). |
 
 ---
 
 **Output options**
 
-| Option | Type | Default | Description |
-| --- | --- | --- | --- |
-| `--outdir` | `path` | `./results` | Directory where results are written. |
-| `--monochrome_logs` | `boolean` | `false` | Output logs in plain ASCII. |
+| Option              | Type      | Default     | Description                          |
+| ------------------- | --------- | ----------- | ------------------------------------ |
+| `--outdir`          | `path`    | `./results` | Directory where results are written. |
+| `--monochrome_logs` | `boolean` | `false`     | Output logs in plain ASCII.          |
 
 ### Advanced usage
 
@@ -175,12 +175,12 @@ All dependencies are containerised in publicly available Docker/Singularity imag
 
 Key software used by the `strain_mapper` sub-workflow:
 
-| Software | Version | Image |
-| --- | --- | --- |
-| Bowtie2 | — | `quay.io/biocontainers/bowtie2:*` |
-| Samtools | — | `quay.io/biocontainers/samtools:*` |
-| Picard | — | `quay.io/biocontainers/picard:*` |
-| bcftools | — | `quay.io/biocontainers/bcftools:*` |
+| Software | Version | Image                              |
+| -------- | ------- | ---------------------------------- |
+| Bowtie2  | —       | `quay.io/biocontainers/bowtie2:*`  |
+| Samtools | —       | `quay.io/biocontainers/samtools:*` |
+| Picard   | —       | `quay.io/biocontainers/picard:*`   |
+| bcftools | —       | `quay.io/biocontainers/bcftools:*` |
 
 See `assorted-sub-workflows/strain_mapper/modules/` for pinned container versions.
 
