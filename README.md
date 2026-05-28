@@ -172,12 +172,12 @@ All dependencies are containerised in publicly available Docker/Singularity imag
 
 Key software used by the `strain_mapper` sub-workflow:
 
-| Software | Version | Image                              |
-| -------- | ------- | ---------------------------------- |
-| Bowtie2  | —       | `quay.io/biocontainers/bowtie2:*`  |
-| Samtools | —       | `quay.io/biocontainers/samtools:*` |
-| Picard   | —       | `quay.io/biocontainers/picard:*`   |
-| bcftools | —       | `quay.io/biocontainers/bcftools:*` |
+| Software | Version | Image                                                  |
+| -------- | ------- | ------------------------------------------------------ |
+| Bowtie2  | 2.5.1   | `quay.io/biocontainers/bowtie2:2.5.1--py310h8d7afc0_0` |
+| Samtools | 1.17    | `quay.io/biocontainers/samtools:1.17--hd87286a_2`      |
+| Picard   | 3.1.1   | `quay.io/biocontainers/picard:3.1.1--hdfd78af_0`       |
+| bcftools | 1.17    | `quay.io/biocontainers/bcftools:1.17--h3cc50cf_1`      |
 
 See `assorted-sub-workflows/strain_mapper/modules/` for pinned container versions.
 
