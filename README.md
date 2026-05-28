@@ -12,7 +12,7 @@
 
 The pipeline performs the following steps:
 
-1. **Input** — reads are loaded from a local manifest CSV or from iRODS (by study/run/lane/plex IDs) via the `mixed_input` sub-workflow.
+1. **Input** — reads are loaded (see [Input](#input)).
 2. **Reference indexing** — Bowtie2 and Samtools indexes are built for the reference if not already present in the same directory.
 3. **Mapping** — reads are aligned to the reference with Bowtie2.
 4. **SAM → BAM processing** — the alignment is converted to sorted, indexed BAM; duplicate reads are marked with Picard.
@@ -88,9 +88,7 @@ bsub -o output.o -e error.e -q oversubscribed -R "select[mem>4000] rusage[mem=40
 
 ### Input
 
-Two input modes are available and can be combined:
-
-**1. Local manifest CSV (`--manifest_of_reads`)**
+#### Manifest (`--manifest`)
 
 A CSV file with the required header `ID,R1,R2`, containing per-sample paths to paired `.fastq.gz` files:
 
@@ -100,21 +98,17 @@ sampleA,/path/to/sampleA_1.fastq.gz,/path/to/sampleA_2.fastq.gz
 sampleB,/path/to/sampleB_1.fastq.gz,/path/to/sampleB_2.fastq.gz
 ```
 
+#### Generating a manifest
+
 **Sanger users:** the [manifest_generator](https://gitlab.internal.sanger.ac.uk/sanger-pathogens/pipelines/manifest_generator/) tool can generate a compatible `ID,R1,R2` manifest from a directory of FASTQ files or from iRODS.
 
-**2. iRODS manifest (`--manifest_of_lanes`) or study/run/lane/plex IDs**
+#### Other input modes
 
-Specify iRODS identifiers to stream reads directly from the Sanger iRODS system:
+This pipeline supports additional input modes via the `mixed_input` sub-workflow — these can be combined in a single run:
 
-```
---studyid <study_id> [--runid <run_id> [--laneid <lane_id> [--plexid <plex_id>]]]
-```
-
-Or provide a CSV manifest with iRODS identifiers via `--manifest_of_lanes`.
-
-**3. ENA download** — supply a file of ENA accession IDs via `--manifest_ena`. Set `--accession_type` to `run` (default), `sample`, or `study`.
-
-**4. Directory scan** — provide a path to a directory of FASTQ files via `--manifest_from_dir`. Use `--fastq_validation` (`strict`/`relaxed`, default: `strict`) and `--max_depth` (default: `0`) to control discovery.
+- **iRODS** (Sanger internal) — specify `--studyid`, `--runid`, `--laneid`, and/or `--plexid` on the command line; at least `--studyid` or `--runid` is required. A batch CSV of multiple iRODS searches can be supplied via `--manifest_of_lanes`. Requires an active iRODS session (`iinit`).
+- **ENA download** — supply a file of ENA accession IDs via `--manifest_ena`. Set `--accession_type` to `run` (default), `sample`, or `study`.
+- **Directory scan** — provide a path to a directory of FASTQ files via `--manifest_from_dir`. Use `--fastq_validation` (`strict`/`relaxed`, default: `strict`) and `--max_depth` (default: `0`) to control discovery.
 
 Run `--help` for the full parameter list.
 
