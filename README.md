@@ -118,14 +118,27 @@ Results are written to `--outdir` (default: `./results`):
 
 ```
 results/
-  bowtie2/
-    <sample_ID>.bam                   # Sorted, deduplicated BAM
-    <sample_ID>.bam.bai
-  variants/
-    <sample_ID>.vcf.gz                # Filtered VCF
-    <sample_ID>.vcf.gz.tbi
-  consensus/
-    <sample_ID>.consensus.fasta       # Consensus FASTA
+  bowtie2/                                          # Bowtie2 index files (if --mapper bowtie2 and index was built by the pipeline)
+  bwa/                                              # BWA index files (if --mapper bwa and index was built by the pipeline)
+  sorted_ref/                                       # Reference FASTA index (.fai)
+  <sample_ID>/
+    vcf/
+      <sample_ID>.vcf.gz                            # Final compressed VCF (all sites or alt-only)
+      heterozygous_sites/
+        <sample_ID>_heterozygous_sites.vcf.gz       # Heterozygous sites extracted from filtered VCF
+    curated_consensus/
+      <sample_ID>_<reference>.fa                    # Consensus FASTA sequence
+    samtools_sort/                                  # Sorted BAM and index (if --keep_sorted_bam)
+      <sample_ID>_sorted.bam
+      <sample_ID>_sorted.bai
+    picard/                                         # Deduplicated BAM (if --keep_dedup_bam)
+      <sample_ID>_duplicates_removed.bam
+      <sample_ID>_duplicates_removed.bai
+    samtools_stats/                                 # SAMtools stats and flagstats (if --samtools_stats)
+      <sample_ID>.stats
+      <sample_ID>.flagstats
+    deeptools_bigwigs/                              # BigWig coverage track (if --bigwig)
+      <sample_ID>.bw
 ```
 
 ### Parameters
