@@ -39,7 +39,7 @@ Default quality filters applied during variant filtering:
 1. Clone this repository (including submodules):
 
    ```bash
-   git clone --recurse-submodules https://gitlab.internal.sanger.ac.uk/sanger-pathogens/pipelines/strain_mapper.git
+   git clone --recurse-submodules <repo-url>
    cd strain_mapper
    ```
 
