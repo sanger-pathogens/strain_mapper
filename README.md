@@ -186,7 +186,9 @@ See `assorted-sub-workflows/strain_mapper/modules/` for pinned container version
 - **Reference index not found**: the pipeline builds Bowtie2 and Samtools indexes if not already present alongside the reference file. Ensure the reference directory is writable.
 - **iRODS authentication**: if using iRODS input, run `iinit` to authenticate before launching the pipeline.
 - **Resuming a failed run**: add `-resume` to your command to restart from cached intermediate results.
-- For further help, check `.nextflow.log` and the per-process logs in the `work/` directory.
+- For further help, check `.nextflow.log` and the per-process `.command.log` logs in the `work/` directory.
+
+Sanger users may find [this page](https://ssg-confluence.internal.sanger.ac.uk/spaces/PaMI/pages/181078206/General+pipeline+info#Generalpipelineinfo-Troubleshootingafailedpipelinerunandsendingabugreport) useful for troubleshooting Nextflow pipeline runs.
 
 ## Issues and Contributions
 
