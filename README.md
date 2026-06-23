@@ -1,4 +1,4 @@
-# strain_mapper
+# Strain Mapper
 
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A521.04.0-23aa62.svg?labelColor=000000)](https://www.nextflow.io/)
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
@@ -8,7 +8,7 @@
 
 ## Pipeline overview
 
-**strain_mapper** is a Nextflow DSL2 pipeline for mapping short-read bacterial sequencing data to a reference genome and calling variants. Starting from paired FASTQ files, it produces per-sample VCF files and consensus FASTA sequences.
+Strain Mapper is a Nextflow DSL2 pipeline for mapping short-read bacterial sequencing data to a reference genome and calling variants. Starting from paired FASTQ files, it produces per-sample VCF files and consensus FASTA sequences.
 
 The pipeline performs the following steps:
 
@@ -206,11 +206,9 @@ Variant filters are applied via a bcftools expression. To modify the default thr
 
 ### Dependencies
 
-All dependencies are containerised in publicly available Docker/Singularity images.
+All dependencies are containerised in publicly available images.
 
 ## Software versions
-
-Key software used by the `strain_mapper` sub-workflow:
 
 | Software | Version | Image                                                  |
 | -------- | ------- | ------------------------------------------------------ |
@@ -223,10 +221,10 @@ See `assorted-sub-workflows/strain_mapper/modules/` for pinned container version
 
 ## Troubleshooting
 
-- **Reference index not found**: the pipeline builds Bowtie2 and Samtools indexes if not already present alongside the reference file. Ensure the reference directory is writable.
 - **iRODS authentication**: if using iRODS input, run `iinit` to authenticate before launching the pipeline.
 - **Resuming a failed run**: add `-resume` to your command to restart from cached intermediate results.
-- For further help, check `.nextflow.log` and the per-process `.command.log` logs in the `work/` directory.
+
+For further help, check `.nextflow.log` and the per-process `.command.log` logs in the `work/` directory.
 
 Sanger users may find [this page](https://ssg-confluence.internal.sanger.ac.uk/spaces/PaMI/pages/181078206/General+pipeline+info#Generalpipelineinfo-Troubleshootingafailedpipelinerunandsendingabugreport) useful for troubleshooting Nextflow pipeline runs.
 
