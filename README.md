@@ -13,9 +13,9 @@
 The pipeline performs the following steps:
 
 1. **Reference indexing** — Bowtie2 and Samtools indexes are built for the reference if not already present in the same directory.
-2. **Mapping** — reads are aligned to the reference with Bowtie2.
-3. **SAM → BAM processing** — the alignment is converted to sorted, indexed BAM; duplicate reads are marked with Picard.
-4. **Variant calling** — bcftools mpileup generates genotype likelihoods and bcftools call calls variants.
+2. **Mapping** — reads are aligned to the reference with [Bowtie2](https://github.com/benlangmead/bowtie2).
+3. **SAM → BAM processing** — the alignment is converted to sorted, indexed BAM; duplicate reads are marked with [Picard](https://github.com/broadinstitute/picard).
+4. **Variant calling** — [BCFtools'](https://samtools.github.io/bcftools/) `mpileup` generates genotype likelihoods and `bcftools call` calls variants.
 5. **Variant filtering** — variants are classified as `PASS`, `Het` (heterozygous), or `LowQual` based on quality, strand support, and coverage thresholds.
 6. **Consensus** — a consensus FASTA sequence is generated from the PASS variants.
 
