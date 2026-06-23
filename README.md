@@ -144,7 +144,7 @@ results/
 
 ### Parameters
 
-**Sequencing reads input**
+**Sequencing reads input options**
 
 | Option                | Type     | Default | Description                                                |
 | --------------------- | -------- | ------- | ---------------------------------------------------------- |
@@ -157,20 +157,46 @@ results/
 
 ---
 
-**Reference**
+**Reference input options**
 
-| Option        | Type   | Default | Description                                   |
-| ------------- | ------ | ------- | --------------------------------------------- |
-| `--reference` | `path` | `""`    | Path to the reference FASTA file (mandatory). |
+| Option        | Type   | Default | Description                                  |
+| ------------- | ------ | ------- | -------------------------------------------- |
+| `--reference` | `path` | `""`    | Path to the reference FASTA file (required). |
 
 ---
 
 **Output options**
 
-| Option              | Type      | Default     | Description                          |
-| ------------------- | --------- | ----------- | ------------------------------------ |
-| `--outdir`          | `path`    | `./results` | Directory where results are written. |
-| `--monochrome_logs` | `boolean` | `false`     | Output logs in plain ASCII.          |
+| Option     | Type   | Default     | Description                          |
+| ---------- | ------ | ----------- | ------------------------------------ |
+| `--outdir` | `path` | `./results` | Directory where results are written. |
+
+---
+
+**Mapping options**
+
+| Option                      | Type      | Default                                                                                             | Description                                                                                                                                                                                         |
+| --------------------------- | --------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--mapper`                  | `string`  | `bowtie2`                                                                                           | Mapping tool to use. Options: bwa, bowtie2                                                                                                                                                          |
+| `--minimum_base_quality`    | `int`     | `20`                                                                                                | Minimum quality of a base for it to be carried forwards into the pileup and downstream to variant calling                                                                                           |
+| `--only_report_alts`        | `boolean` | `true`                                                                                              | Only include ALT variants in the VCF output. Set false to also report reference-matching sites (REF).                                                                                               |
+| `--VCF_filters`             | `string`  | `QUAL>=50 & MIN(DP)>=8 & ((ALT!=\".\" & DP4[2]>3 & DP4[3]>3) \| (ALT=\".\" & DP4[0]>3 & DP4[1]>3))` | bcftools expression for filtering VCF records. By default, retains only sites with quality scores of 50 or more, read depth of 8 or more, and at least 4 reads per strand supporting the call.      |
+| `--skip_filtering`          | `boolean` | `false`                                                                                             | Do not filter variants called using `bcftools call` based on metrics defined with `--VCF_filters`.                                                                                                  |
+| `--keep_raw_vcf`            | `boolean` | `false`                                                                                             | Save the unfiltered VCF generated directly by bcftools call. Can be combined with `--only_report_alts false` to report all called sites (REF and ALT). Only relevant when `--skip_filtering false`. |
+| `--keep_sorted_bam`         | `boolean` | `false`                                                                                             | Save the mapping file (sorted BAM) and its index (.bai file).                                                                                                                                       |
+| `--keep_dedup_bam`          | `boolean` | `false`                                                                                             | Save the mapping file (sorted, then deduplicated BAM) generated with Picardtools.                                                                                                                   |
+| `--skip_read_deduplication` | `boolean` | `false`                                                                                             | Skip removal of duplicate reads using Picard.                                                                                                                                                       |
+| `--bigwig`                  | `boolean` | `false`                                                                                             | Produce bigwig genome coverage file from sorted BAM file using Deeptools. Saves the BAM index (.bai) file alongside.                                                                                |
+| `--samtools_stats`          | `boolean` | `false`                                                                                             | Produce statistics summary files from sorted BAM using `samtools stats` and `samtools flagstats` commands.                                                                                          |
+| `--skip_cleanup`            | `boolean` | `false`                                                                                             | Most intermediate files are deleted on successful completion of the pipeline, add this flag to keep intermediates.                                                                                  |
+
+---
+
+**Logging options**
+
+| Option              | Type      | Default | Description                 |
+| ------------------- | --------- | ------- | --------------------------- |
+| `--monochrome_logs` | `boolean` | `false` | Output logs in plain ASCII. |
 
 ### Advanced usage
 
