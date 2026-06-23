@@ -230,6 +230,8 @@ Sanger users may find [this page](https://ssg-confluence.internal.sanger.ac.uk/s
 
 ## Issues and Contributions
 
+Strain Mapper's workflow was originally produced by Marta Matuszewska and adapted into a Nextflow pipeline by PAM Informatics.
+
 **GitHub users:** if you find an issue with this pipeline, or would like to suggest an improvement, please log an issue or open a pull request on this repository.
 
 **Sanger users:** if you need internal support, you can raise an issue on the PAM Freshservice portal: https://sanger.freshservice.com/support/catalog/items/426
