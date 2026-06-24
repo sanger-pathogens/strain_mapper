@@ -1,217 +1,237 @@
-# strain_mapper
+# Strain Mapper
 
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A521.04.0-23aa62.svg?labelColor=000000)](https://www.nextflow.io/)
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
 [![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
 
-## Introduction
+[[_TOC_]]
 
-**strain_mapper** is a pipeline for mapping short read sequences of bacteria to a given reference.
+## Pipeline overview
 
-## Pipeline summary
+Strain Mapper is a Nextflow DSL2 pipeline for mapping short-read bacterial sequencing data to a reference genome and calling variants. Starting from paired FASTQ files, it produces per-sample VCF files and consensus FASTA sequences.
 
-**strain_mapper** maps short read sequences to a given reference genome using bowtie2. It generates a VCF containing genotype likelihoods for the alignment using `bcftools mpileup` and subsequently uses `bcftools call` to call the variants. This variant information is then used to create a consensus sequence based on the mapped reads.
+The pipeline performs the following steps:
 
-The pipeline will build reference and bowtie2 indexes if it doesn't find them in the same directory as the supplied `--reference`.
+1. **Reference indexing** — Bowtie2 and Samtools indexes are built for the reference if not already present in the same directory.
+2. **Mapping** — reads are aligned to the reference with [Bowtie2](https://github.com/benlangmead/bowtie2).
+3. **SAM → BAM processing** — the alignment is converted to sorted, indexed BAM; duplicate reads are marked with [Picard](https://github.com/broadinstitute/picard).
+4. **Variant calling** — [BCFtools'](https://samtools.github.io/bcftools/) `mpileup` generates genotype likelihoods and `bcftools call` calls variants.
+5. **Variant filtering** — variants are classified as `PASS`, `Het` (heterozygous), or `LowQual` based on quality, strand support, and coverage thresholds.
+6. **Consensus** — a consensus FASTA sequence is generated from the PASS variants.
 
-All relevant intermediate files are currently published in process-specific directories within the supplied `--outdir` directory.
+Default quality filters applied during variant filtering:
 
-## Getting started
+| Filter                                | Threshold                    |
+| ------------------------------------- | ---------------------------- |
+| Minimum quality (QUAL)                | ≥ 50                         |
+| Minimum forward strand reads (ADF[0]) | ≥ 3                          |
+| Minimum reverse strand reads (ADR[0]) | ≥ 3                          |
+| Minimum total depth (DP)              | ≥ 8                          |
+| Genotype                              | Homozygous only (0/0 or 1/1) |
 
-### Running on the farm (Sanger HPC clusters)
+## Usage
 
-1. Load nextflow and singularity modules:
+### Quickstart
+
+#### From source code
+
+1. Clone this repository (including submodules):
 
    ```bash
-   module load nextflow ISG/singularity
-   ```
-
-2. Clone the repo:
-
-   ```bash
-   git clone --recurse-submodules git@gitlab.internal.sanger.ac.uk:sanger-pathogens/pipelines/strain_mapper.git
+   git clone --recurse-submodules <repo-url>
    cd strain_mapper
    ```
 
-3. Start the pipeline  
-   For example input, please see [Generating a manifest](#generating-a-manifest).
-
-   Example:
+2. To run with `docker`, use the `-profile docker` option:
 
    ```bash
-   nextflow run . --manifest_of_reads ./test_data/inputs/new_manifest.csv --reference ./test_data/inputs/ref/GCF_000011265.1.fna --outdir my_output
+   nextflow run main.nf \
+       -profile docker \
+       --manifest_of_reads manifest.csv \
+       --reference /path/to/reference.fna \
+       --outdir my_output
    ```
 
-   It is good practice to submit a dedicated job for the nextflow master process (use the `oversubscribed` queue):
+   Other profiles are also supported (`singularity`).  
+   :warning: If no profile is specified the pipeline will run with the Sanger HPC-specific configuration.
 
-   ```bash
-   bsub -o output.o -e error.e -q oversubscribed -R "select[mem>4000] rusage[mem=4000]" -M4000 nextflow run . --manifest_of_reads ./test_data/inputs/new_manifest.csv --reference ./test_data/inputs/ref/GCF_000011265.1.fna --outdir my_output
-   ```
-
-   See [usage](#usage) for all available pipeline options.
-
-4. Once your run has finished, check output in the `outdir` and clean up any intermediate files. To do this (assuming no other pipelines are running from the current working directory) run:
+3. Once the run has finished successfully and you have inspected the output, clean up intermediate files. The `work/` directory and `.nextflow.log` are useful for troubleshooting — do not delete them until you are satisfied the outputs are correct:
 
    ```bash
    rm -rf work .nextflow*
    ```
 
-## Generating a manifest
+   Alternatively, use `nextflow clean` for more fine-grained control over which runs and intermediate files are removed.
 
-Manifests supplied as an argument to `--manifest_of_reads` should be of of the following format:
+#### Using on the Sanger farm
 
-```console
+First load the latest pipeline module:
+
+```bash
+module load strain-mapper
+```
+
+Then run on the command line with `strain-mapper <options>`. For instance, to see a help message:
+
+```bash
+strain-mapper --help
+```
+
+Submit to LSF:
+
+```bash
+bsub -o output.o -e error.e -q oversubscribed -R "select[mem>4000] rusage[mem=4000]" -M4000 \
+    strain-mapper \
+        --manifest_of_reads manifest.csv \
+        --reference /path/to/reference.fna \
+        --outdir my_output
+```
+
+### Input
+
+#### Manifest (`--manifest`)
+
+A CSV file with the required header `ID,R1,R2`, containing per-sample paths to paired `.fastq.gz` files:
+
+```
 ID,R1,R2
-test_id,./test_data/inputs/test_1.fastq.gz,./test_data/inputs/test_2.fastq.gz
+sampleA,/path/to/sampleA_1.fastq.gz,/path/to/sampleA_2.fastq.gz
+sampleB,/path/to/sampleB_1.fastq.gz,/path/to/sampleB_2.fastq.gz
 ```
 
-Where column `ID` can be an arbitrary sample identifier, `R1` is a .fastq.gz file of forward reads, `R2` is the mate .fastq.gz file containing reverse reads.
+#### Generating a manifest
 
-Scripts have been developed to generate manifests appropriate for this pipeline:
+**Sanger users:** the [manifest_generator](https://gitlab.internal.sanger.ac.uk/sanger-pathogens/pipelines/manifest_generator/) tool can generate a compatible `ID,R1,R2` manifest from a directory of FASTQ files or from iRODS.
 
-- To generate a manifest from a file of lane identifiers visible to `pf`, use [this script](./scripts/generate_manifest_from_lanes.sh).
+#### Other input modes
 
-- To generate a manifest from a file of custom .fastq.gz paths, use [this script](./scripts/generate_manifest.sh).
+This pipeline supports additional input modes via the `mixed_input` sub-workflow — these can be combined in a single run:
 
-Please run `--help` on these scripts for more information on script usage.
+- **iRODS** (Sanger internal) — specify `--studyid`, `--runid`, `--laneid`, and/or `--plexid` on the command line; at least `--studyid` or `--runid` is required. A batch CSV of multiple iRODS searches can be supplied via `--manifest_of_lanes`. Requires an active iRODS session (`iinit`).
+- **ENA download** — supply a file of ENA accession IDs via `--manifest_ena`. Set `--accession_type` to `run` (default), `sample`, or `study`.
+- **Directory scan** — provide a path to a directory of FASTQ files via `--manifest_from_dir`. Use `--fastq_validation` (`strict`/`relaxed`, default: `strict`) and `--max_depth` (default: `0`) to control discovery.
 
-## Usage
+Run `--help` for the full parameter list.
 
-```console
-Usage:
-strain-mapper [--manifest_of_reads <path to manifest>] [--manifest_of_lanes <path to manifest>] [--studyid <study_id>, [--runid <run_id>, [--laneid <lane_id>, [--plexid <plex_id>]]]] --reference <path to reference> --outdir <path to results folder>
+### Output
 
-Input parameters:
+Results are written to `--outdir` (default: `./results`):
 
-  Sequencing reads:
-    There are two ways of providing input reads, which can be combined:
-
-    1) through direct input of compressed fastq sequence reads files. This kind of input is passed by specifying the paths to the
-       read files via a manifest listing the pair of read files pertaing to a sample, one per row.
-
-    --manifest_of_reads          Manifest containing per-sample paths to .fastq.gz files (optional)
-
-    2) through specification of data to be downloaded from iRODS. Each sample is defined by a combination of study, run, lane and plex ids
-       (these ids correspond to the reference of the sequencing experiment). Run, lane and plex ids are not mandatory: when provided, these
-       parameters gradually restrict of files to be downloaded; when ommitted, samples for all possible values are retrieved.
-       This information can be provided via a combination of workflow parameters passed on through command line options: --study, --runid,
-       --laneid and --plexid; this defines a single sequencing dataset based on a combination of study, run, lane and plex ids.
-
-    --studyid                    ID of sequencing study including read data to use as pipeline input (mandatory)
-    --runid                      ID of sequencing run including read data to use as pipeline input (mandatory)
-    --laneid                     ID of sequencing lane (as in a lane within of a flow cell) including read data to use as pipeline input (mandatory)
-    --plexid                     ID of sequencing lane multiplex tag index including read data to use as pipeline input (mandatory)
-
-        Alternatively, the user can provide a manifest listing a batch of such combinations.
-
-   --manifest_of_lanes          Manifest containing specification of data to be downloaded from iRODS (optional)
-                                 Each row defines a sequencing dataset based on a combination of study, run, lane and plex ids.
-                                 Run, lane and plex ids are not mandatory (field in csv file can be left blank);
-                                 when provided, these gradually restrict of files to be downloaded.
-
-  NB: the real lane id is different from the the so-called "lane" id, a term commonly used in Sanger referring to this sequencing run output unit, usually labelled with this syntax: 48106_1#83.
-  In this, the run id is 48106, the (real) lane id is 1 and the plex id is 83.
-
-  Other input parameters:
-    --reference                  Reference to map reads against (mandatory)
-
-Output parameters:
-    --outdir                     Specify output directory [default: ./results] (optional)
-
-General options:
-  --help                       Print summary of main parameters and options (optional)
-  --help_all                   Print extensive list of parameters and options (optional)
-    --help                       Print this help message (optional)
+```
+results/
+  bowtie2/                                          # Bowtie2 index files (if --mapper bowtie2 and index was built by the pipeline)
+  bwa/                                              # BWA index files (if --mapper bwa and index was built by the pipeline)
+  sorted_ref/                                       # Reference FASTA index (.fai)
+  <sample_ID>/
+    vcf/
+      <sample_ID>.vcf.gz                            # Final compressed VCF (all sites or alt-only)
+      heterozygous_sites/
+        <sample_ID>_heterozygous_sites.vcf.gz       # Heterozygous sites extracted from filtered VCF
+    curated_consensus/
+      <sample_ID>_<reference>.fa                    # Consensus FASTA sequence
+    samtools_sort/                                  # Sorted BAM and index (if --keep_sorted_bam)
+      <sample_ID>_sorted.bam
+      <sample_ID>_sorted.bai
+    picard/                                         # Deduplicated BAM (if --keep_dedup_bam)
+      <sample_ID>_duplicates_removed.bam
+      <sample_ID>_duplicates_removed.bai
+    samtools_stats/                                 # SAMtools stats and flagstats (if --samtools_stats)
+      <sample_ID>.stats
+      <sample_ID>.flagstats
+    deeptools_bigwigs/                              # BigWig coverage track (if --bigwig)
+      <sample_ID>.bw
 ```
 
-## Default filtering
+### Parameters
 
-The pipeline applies stringent quality filters to ensure high-confidence consensus sequences:
+**Sequencing reads input options**
 
-1. Quality Thresholds:
+| Option                | Type     | Default | Description                                                |
+| --------------------- | -------- | ------- | ---------------------------------------------------------- |
+| `--manifest_of_reads` | `path`   | `null`  | Manifest CSV with header `ID,R1,R2` for local FASTQ input. |
+| `--manifest_of_lanes` | `path`   | `null`  | Manifest CSV with iRODS study/run/lane/plex IDs.           |
+| `--studyid`           | `string` | `null`  | iRODS study ID.                                            |
+| `--runid`             | `string` | `null`  | iRODS run ID.                                              |
+| `--laneid`            | `string` | `null`  | iRODS lane ID.                                             |
+| `--plexid`            | `string` | `null`  | iRODS plex ID.                                             |
 
-- Minimum quality score: `≥50 (QUAL)`
+---
 
-- Read support:
+**Reference input options**
 
-  - ≥3 forward reads (`INFO/ADF[0]`)
+| Option        | Type   | Default | Description                                  |
+| ------------- | ------ | ------- | -------------------------------------------- |
+| `--reference` | `path` | `""`    | Path to the reference FASTA file (required). |
 
-  - ≥3 reverse reads (`INFO/ADR[0]`)
+---
 
-- Coverage: ≥8 total reads at position (`INFO/DP`)
+**Output options**
 
-2. Genotype Requirements:
+| Option     | Type   | Default     | Description                          |
+| ---------- | ------ | ----------- | ------------------------------------ |
+| `--outdir` | `path` | `./results` | Directory where results are written. |
 
-- Only homozygous calls (`0/0 `or `1/1`) are included
+---
 
-- All multiallelic/heterozygous calls (`0/1`) are marked as `'Het'` and excluded
+**Mapping options**
 
-3. Filter Classification:
+| Option                      | Type      | Default                                                                                             | Description                                                                                                                                                                                         |
+| --------------------------- | --------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--mapper`                  | `string`  | `bowtie2`                                                                                           | Mapping tool to use. Options: bwa, bowtie2                                                                                                                                                          |
+| `--minimum_base_quality`    | `int`     | `20`                                                                                                | Minimum quality of a base for it to be carried forwards into the pileup and downstream to variant calling                                                                                           |
+| `--only_report_alts`        | `boolean` | `true`                                                                                              | Only include ALT variants in the VCF output. Set false to also report reference-matching sites (REF).                                                                                               |
+| `--VCF_filters`             | `string`  | `QUAL>=50 & MIN(DP)>=8 & ((ALT!=\".\" & DP4[2]>3 & DP4[3]>3) \| (ALT=\".\" & DP4[0]>3 & DP4[1]>3))` | bcftools expression for filtering VCF records. By default, retains only sites with quality scores of 50 or more, read depth of 8 or more, and at least 4 reads per strand supporting the call.      |
+| `--skip_filtering`          | `boolean` | `false`                                                                                             | Do not filter variants called using `bcftools call` based on metrics defined with `--VCF_filters`.                                                                                                  |
+| `--keep_raw_vcf`            | `boolean` | `false`                                                                                             | Save the unfiltered VCF generated directly by bcftools call. Can be combined with `--only_report_alts false` to report all called sites (REF and ALT). Only relevant when `--skip_filtering false`. |
+| `--keep_sorted_bam`         | `boolean` | `false`                                                                                             | Save the mapping file (sorted BAM) and its index (.bai file).                                                                                                                                       |
+| `--keep_dedup_bam`          | `boolean` | `false`                                                                                             | Save the mapping file (sorted, then deduplicated BAM) generated with Picardtools.                                                                                                                   |
+| `--skip_read_deduplication` | `boolean` | `false`                                                                                             | Skip removal of duplicate reads using Picard.                                                                                                                                                       |
+| `--bigwig`                  | `boolean` | `false`                                                                                             | Produce BigWig genome coverage file from sorted BAM file using Deeptools. Saves the BAM index (.bai) file alongside.                                                                                |
+| `--samtools_stats`          | `boolean` | `false`                                                                                             | Produce statistics summary files from sorted BAM using `samtools stats` and `samtools flagstat` commands.                                                                                           |
+| `--skip_cleanup`            | `boolean` | `true`                                                                                              | Retain intermediate files that would by default be deleted after successful pipeline completion.                                                                                                    |
 
-- `'PASS'`: Meets all quality thresholds
+---
 
-- `'Het'`: Passes quality but has heterozygous genotype (excluded)
+**Logging options**
 
-- `'LowQual'`: Fails one or more quality thresholds (excluded)
+| Option              | Type      | Default | Description                 |
+| ------------------- | --------- | ------- | --------------------------- |
+| `--monochrome_logs` | `boolean` | `false` | Output logs in plain ASCII. |
 
-To edit these filters, please follow the documentation as seen on the BCFTOOLS view page under expressions:
+### Advanced usage
 
-https://samtools.github.io/bcftools/bcftools.html#expressions
+#### Customising variant filters
 
-### Unfiltered Mode (Advanced Use)
+Variant filters are applied via a bcftools expression. To modify the default thresholds, refer to the [bcftools expressions documentation](https://samtools.github.io/bcftools/bcftools.html#expressions) and configure custom filter expressions via the pipeline's module parameters.
 
-When using --skip_filtering:
+### Dependencies
 
-- All variants are included regardless of:
+All dependencies are containerised in publicly available images.
 
-      - Quality scores
-      - Read depth
-      - Genotype (including heterozygous calls)
+## Software versions
 
-- Results may contain:
+| Software | Version | Image                                                  |
+| -------- | ------- | ------------------------------------------------------ |
+| Bowtie2  | 2.5.1   | `quay.io/biocontainers/bowtie2:2.5.1--py310h8d7afc0_0` |
+| Samtools | 1.17    | `quay.io/biocontainers/samtools:1.17--hd87286a_2`      |
+| Picard   | 3.1.1   | `quay.io/biocontainers/picard:3.1.1--hdfd78af_0`       |
+| bcftools | 1.17    | `quay.io/biocontainers/bcftools:1.17--h3cc50cf_1`      |
 
-      - Lower-confidence variants
-      - More ambiguous positions
-      - Potential sequencing artifacts
+See `assorted-sub-workflows/strain_mapper/modules/` for pinned container versions.
 
-> **_NOTE_** Unfiltered mode is not recommended for standard consensus generation but may be useful for debugging or specialized analyses.
+## Troubleshooting
 
-## Output
+- **iRODS authentication**: if using iRODS input, run `iinit` to authenticate before launching the pipeline.
+- **Resuming a failed run**: add `-resume` to your command to restart from cached intermediate results.
 
-You will find the variant (.vcf.gz) file and the curated consensus sequence (.fasta) for each sample under the corresponding sample directory within the supplied --outdir directory. If you also wish to retain the sorted BAM files, please use --keep_sorted_bam=true.
+For further help, check `.nextflow.log` and the per-process `.command.log` logs in the `work/` directory.
 
-## Contributions and testing
+Sanger users may find [this page](https://ssg-confluence.internal.sanger.ac.uk/spaces/PaMI/pages/181078206/General+pipeline+info#Generalpipelineinfo-Troubleshootingafailedpipelinerunandsendingabugreport) useful for troubleshooting Nextflow pipeline runs.
 
-Developer contributions to this pipeline will only be accepted if all pipeline tests pass. To check:
+## Issues and Contributions
 
-1. Make your changes.
+Strain Mapper's workflow was originally produced by Marta Matuszewska and adapted into a Nextflow pipeline by PAM Informatics.
 
-2. Download the test data. A utility script is provided:
+**GitHub users:** if you find an issue with this pipeline, or would like to suggest an improvement, please log an issue or open a pull request on this repository.
 
-   ```
-   python3 scripts/download_test_data.py
-   ```
-
-3. Install [`nf-test`](https://code.askimed.com/nf-test/installation/) (>=0.7.0) and run the tests:
-
-   ```
-   nf-test test tests/*.nf.test
-   ```
-
-   If running on Sanger HPC cluster, add the option `--profile sanger_local`.
-
-4. Submit a PR.
-
-## Credits
-
-strain_mapper was originally produced by Marta Matuszewska and adapted for nextflow by PAM informatics.
-
-## Support
-
-For further information or help, don't hesitate to get in touch via [path-help@sanger.ac.uk](mailto:path-help@sanger.ac.uk).
-
-## Citations
-
-If you use strain_mapper for your analysis, please cite the following doi: <PLACEHOLDER_FOR_CITATION>
-
-An extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
+**Sanger users:** if you need internal support, you can raise an issue on the PAM Freshservice portal: https://sanger.freshservice.com/support/catalog/items/426
