@@ -33,6 +33,7 @@ def printHelp() {
 include { MIXED_INPUT       } from './assorted-sub-workflows/mixed_input/mixed_input.nf'
 include { IRODS_EXTRACTOR   } from './assorted-sub-workflows/irods_extractor/subworkflows/irods.nf'
 include { STRAIN_MAPPER     } from './assorted-sub-workflows/strain_mapper/strain_mapper.nf'
+include { REF_MANIFEST_PARSE } from './assorted-sub-workflows/strain_mapper/subworkflows/ref_manifest.nf'
 
 
 /*
@@ -50,14 +51,21 @@ workflow {
     //
     // REFERENCE PROCESSING 
     //
-    reference = file(params.reference, checkIfExists: true)
+    generic_reference = Path(params.reference, checkIfExists: true)
+
+    REF_MANIFEST_PARSE(params.reference_manifest)
+    .map { metaref, reference, -> [metaref.ID, metaref, reference] }
+    | set { ch_reference_manifest }
 
     //
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
     //
 
     MIXED_INPUT
-    | set{all_reads_ready_to_map_ch}
+    .map { metaread, reads_1, reads_2, -> [metaread.ID, metaread, reads_1, reads_2] }
+    .join(ch_reference_manifest)
+    .map { mid, meta, reads_1, reads_2, mref, reference -> [meta, reads_1, reads_2, reference ?: generic_reference] }
+    | set { all_reads_ready_to_map_with_ref_ch }
 
     //
     // SUBWORKFLOW: actual processing; 
@@ -65,7 +73,7 @@ workflow {
     // in the submodule repository assorted-sub-workflows
     //
 
-    STRAIN_MAPPER( all_reads_ready_to_map_ch, reference )
+    STRAIN_MAPPER( all_reads_ready_to_map_with_ref_ch )
 }
 
 workflow.onComplete {
