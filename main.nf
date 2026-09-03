@@ -64,7 +64,7 @@ workflow {
 
     MIXED_INPUT
     .map { metaread, reads_1, reads_2, -> [metaread.ID, metaread, reads_1, reads_2] }
-    .join(ch_reference_manifest)
+    .join(ch_reference_manifest, remainder: true)
     .map { mid, meta, reads_1, reads_2, mref, reference -> [meta, reads_1, reads_2, reference ?: generic_reference] }
     | set { all_reads_ready_to_map_with_ref_ch }
 
