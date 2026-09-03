@@ -52,8 +52,9 @@ workflow {
     // REFERENCE PROCESSING 
     //
     generic_reference = Path(params.reference, checkIfExists: true)
+    reference_manifest = Path(params.reference_manifest, checkIfExists: true)
 
-    REF_MANIFEST_PARSE(params.reference_manifest)
+    REF_MANIFEST_PARSE(reference_manifest)
     .map { metaref, reference, -> [metaref.ID, metaref, reference] }
     | set { ch_reference_manifest }
 
