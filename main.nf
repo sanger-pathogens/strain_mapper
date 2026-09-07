@@ -64,7 +64,7 @@ workflow {
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
     //
 
-    MIXED_INPUT
+    MIXED_INPUT()
 
     MIXED_INPUT.out.all_reads_ready_ch
     .map { metaread, reads_1, reads_2 -> [metaread.ID, metaread, reads_1, reads_2] }
