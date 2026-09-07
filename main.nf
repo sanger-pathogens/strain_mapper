@@ -51,11 +51,13 @@ workflow {
     //
     // REFERENCE PROCESSING 
     //
-    generic_reference = Path(params.reference, checkIfExists: true)
-    reference_manifest = Path(params.reference_manifest, checkIfExists: true)
+    generic_reference = file(params.reference, checkIfExists: true)
+    reference_manifest = file(params.reference_manifest, checkIfExists: true)
 
     REF_MANIFEST_PARSE(reference_manifest)
-    .map { metaref, reference, -> [metaref.ID, metaref, reference] }
+
+    REF_MANIFEST_PARSE.out.references
+    .map { metaref, reference -> [metaref.ID, metaref, reference] }
     .set { ch_reference_manifest }
 
     //
@@ -63,7 +65,9 @@ workflow {
     //
 
     MIXED_INPUT
-    .map { metaread, reads_1, reads_2, -> [metaread.ID, metaread, reads_1, reads_2] }
+
+    MIXED_INPUT.out.all_reads_ready_ch
+    .map { metaread, reads_1, reads_2 -> [metaread.ID, metaread, reads_1, reads_2] }
     .join(ch_reference_manifest, remainder: true)
     .map { mid, meta, reads_1, reads_2, mref, reference -> [meta, reads_1, reads_2, reference ?: generic_reference] }
     .set { all_reads_ready_to_map_with_ref_ch }
