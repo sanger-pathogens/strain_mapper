@@ -10,7 +10,7 @@ def logo = NextflowTool.logo(workflow, params.monochrome_logs)
 
 log.info logo
 
-NextflowTool.commandLineParams(workflow.commandLine, log, params.monochrome_logs)
+NextflowTool.commandLineParams(workflow.commandLine, params, log, params.monochrome_logs)
 
 
 def printHelp() {
@@ -49,37 +49,53 @@ workflow {
     }
 
     //
-    // REFERENCE PROCESSING 
+    // REFERENCE PROCESSING
     //
-    generic_reference = file(params.reference, checkIfExists: true)
-    reference_manifest = file(params.reference_manifest, checkIfExists: true)
 
-    REF_MANIFEST_PARSE(reference_manifest)
+    generic_reference = null
+    reference_manifest = null
 
-    REF_MANIFEST_PARSE.out.references
-    .map { metaref, reference -> [metaref.ID, metaref, reference] }
-    .set { ch_reference_manifest }
+    if (params.reference) {
+        generic_reference = file(params.reference, checkIfExists: true)
+    }
 
-    //
-    // SUBWORKFLOW: Read in samplesheet, validate and stage input files
-    //
+    if (params.reference_manifest) {
+        reference_manifest = file(params.reference_manifest, checkIfExists: true)
+    }
+
+    ch_reference_manifest = channel.empty()
+
+    if (reference_manifest) {
+        REF_MANIFEST_PARSE(reference_manifest)
+
+        REF_MANIFEST_PARSE.out.references
+            .map { metaref, reference -> [metaref.ID, metaref, reference] }
+            .set { ch_reference_manifest }
+    }
 
     MIXED_INPUT()
 
     MIXED_INPUT.out.all_reads_ready_ch
-    .map { metaread, reads_1, reads_2 -> [metaread.ID, metaread, reads_1, reads_2] }
-    .join(ch_reference_manifest, remainder: true)
-    .map { mid, meta, reads_1, reads_2, mref, reference -> [meta, reads_1, reads_2, reference ?: generic_reference] }
-    .filter { meta, reads_1, reads_2, reference -> reference != null }
-    .set { all_reads_ready_to_map_with_ref_ch }
-
+        .map { metaread, reads_1, reads_2 ->
+            [metaread.ID, metaread, reads_1, reads_2]
+        }
+        .join(ch_reference_manifest, remainder: true)
+        .map { row ->
+            def (mid, meta, reads_1, reads_2) = row
+            def reference = row.size() >= 6 ? row[5] : null
+            [meta, reads_1, reads_2, reference ?: generic_reference] // prefer manifest reference if available
+        }
+        .filter { meta, reads_1, reads_2, reference ->
+            reference != null
+        }
+        .set { all_reads_ready_to_map_with_ref_ch }
     //
-    // SUBWORKFLOW: actual processing; 
-    // please refer to  the Nextflow subworkflow strain_mapper
+    // SUBWORKFLOW: actual processing;
+    // please refer to the Nextflow subworkflow strain_mapper
     // in the submodule repository assorted-sub-workflows
     //
 
-    STRAIN_MAPPER( all_reads_ready_to_map_with_ref_ch )
+    STRAIN_MAPPER(all_reads_ready_to_map_with_ref_ch)
 }
 
 workflow.onComplete {
