@@ -94,7 +94,9 @@ workflow {
             [meta, reads_1, reads_2, reference ?: generic_reference] // prefer manifest reference if available
         }
         .filter { meta, reads_1, reads_2, reference ->
-            reference != null
+            // meta is null for reference manifest rows whose ID matched no input sample,
+            // reference is null for samples with no manifest entry and no --reference
+            meta != null && reference != null
         }
         .set { all_reads_ready_to_map_with_ref_ch }
     //

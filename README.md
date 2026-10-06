@@ -12,7 +12,7 @@ Strain Mapper is a Nextflow DSL2 pipeline for mapping short-read bacterial seque
 
 The pipeline performs the following steps:
 
-1. **Reference indexing** — Bowtie2 and Samtools indexes are built for the reference if not already present in the same directory.
+1. **Reference indexing** — Bowtie2 and Samtools indexes are built for each reference used in the run, if not already present in the same directory. Samples can share one reference or be mapped against different references (see [Reference input](#reference-input)).
 2. **Mapping** — reads are aligned to the reference with [Bowtie2](https://github.com/benlangmead/bowtie2).
 3. **SAM → BAM processing** — the alignment is converted to sorted, indexed BAM; duplicate reads are marked with [Picard](https://github.com/broadinstitute/picard).
 4. **Variant calling** — [BCFtools'](https://samtools.github.io/bcftools/) `mpileup` generates genotype likelihoods and `bcftools call` calls variants.
@@ -103,6 +103,28 @@ sampleB,/path/to/sampleB_1.fastq.gz,/path/to/sampleB_2.fastq.gz
 
 **Sanger users:** the [manifest_generator](https://gitlab.internal.sanger.ac.uk/sanger-pathogens/pipelines/manifest_generator/) tool can generate a compatible `ID,R1,R2` manifest from a directory of FASTQ files or from iRODS.
 
+#### Reference input
+
+Every sample must have a reference to map against. There are two ways to supply one, and they can be combined:
+
+- **One reference for the whole run (`--reference`)** — a path to a single reference FASTA, applied to every sample.
+- **A reference per sample (`--reference_manifest`)** — a CSV with the required header `ID,reference`, assigning a specific reference to individual samples:
+
+  ```
+  ID,reference
+  sampleA,/path/to/strain_1.fasta
+  sampleB,/path/to/strain_2.fasta
+  sampleC,NA
+  ```
+
+  `ID` must match a sample ID from the reads input. Reference paths are validated up front and the run fails immediately if one is missing. `NA` means the sample has no specific reference and falls back to `--reference`.
+
+At least one of the two options is required. A sample listed in the reference manifest is mapped against its own reference; any sample not listed is mapped against `--reference`. Samples with neither are dropped from the run (with a warning), so supply `--reference` as a fallback unless you intend to process only the manifested samples.
+
+Each distinct reference is indexed once, regardless of how many samples use it. Consensus FASTA filenames include the reference they were called against, so results from a multi-reference run remain distinguishable.
+
+For the full description of this feature, including index reuse rules and known limitations, see the [strain_mapper sub-workflow README](assorted-sub-workflows/strain_mapper/README.md).
+
 #### Other input modes
 
 This pipeline supports additional input modes via the `mixed_input` sub-workflow — these can be combined in a single run:
@@ -159,9 +181,12 @@ results/
 
 **Reference input options**
 
-| Option        | Type   | Default | Description                                  |
-| ------------- | ------ | ------- | -------------------------------------------- |
-| `--reference` | `path` | `""`    | Path to the reference FASTA file (required). |
+At least one of these is required.
+
+| Option                 | Type   | Default | Description                                                                                                                                                       |
+| ---------------------- | ------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `--reference`          | `path` | `null`  | Path to a reference FASTA file, used for every sample that has no entry in `--reference_manifest`.                                                                 |
+| `--reference_manifest` | `path` | `null`  | Manifest CSV with header `ID,reference`, assigning a reference FASTA per sample ID. Samples not listed fall back to `--reference`. Use `NA` to leave a row unassigned. |
 
 ---
 
