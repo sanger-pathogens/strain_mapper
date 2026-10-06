@@ -57,6 +57,14 @@ workflow {
 
     if (params.reference) {
         generic_reference = file(params.reference, checkIfExists: true)
+    } else {
+        if (!params.reference_manifest) {
+            log.error "Either a reference fasta file or a reference manifest must be provided."
+            printHelp()
+            exit 1
+        } else {
+            log.info "No generic reference provided, will use reference manifest to determine references for each sample. Samples without a reference in the manifest will be skipped."
+        }
     }
 
     if (params.reference_manifest) {
