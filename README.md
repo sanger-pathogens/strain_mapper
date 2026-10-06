@@ -29,7 +29,6 @@ Default quality filters applied during variant filtering:
 | Minimum total depth (DP)              | ≥ 8                          |
 | Genotype                              | Homozygous only (0/0 or 1/1) |
 
-
 ### Quickstart
 
 #### From source code
@@ -206,20 +205,19 @@ For more information, please read [the MIXED_INPUT workflow documentation](./ass
 
 At least one of these is required.
 
-| Option                 | Type   | Default | Description                                                                                                                                                       |
-| ---------------------- | ------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `--reference`          | `path` | `null`  | Path to a reference FASTA file, used for every sample that has no entry in `--reference_manifest`.                                                                 |
+| Option                 | Type   | Default | Description                                                                                                                                                            |
+| ---------------------- | ------ | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--reference`          | `path` | `null`  | Path to a reference FASTA file, used for every sample that has no entry in `--reference_manifest`.                                                                     |
 | `--reference_manifest` | `path` | `null`  | Manifest CSV with header `ID,reference`, assigning a reference FASTA per sample ID. Samples not listed fall back to `--reference`. Use `NA` to leave a row unassigned. |
 
 ---
 
 **Output options**
 
-| Option          | Type      | Default     | Description                          |
+| Option          | Type      | Default     | Description                                                                                            |
 | --------------- | --------- | ----------- | ------------------------------------------------------------------------------------------------------ |
 | `--outdir`      | `path`.   | `./results` | Directory where results are written.                                                                   |
 | `--save_fastqc` | `boolean` | `false`     | Save individual FastQC report (both pre- and post-filtering; redundant with combined MultiQC reports). |
-
 
 ---
 
