@@ -29,31 +29,28 @@ Default quality filters applied during variant filtering:
 | Minimum total depth (DP)              | ≥ 8                          |
 | Genotype                              | Homozygous only (0/0 or 1/1) |
 
-## Usage
 
 ### Quickstart
 
 #### From source code
 
-1. Clone this repository (including submodules):
+1. Clone this repository:
 
    ```bash
-   git clone --recurse-submodules <repo-url>
-   cd strain_mapper
+   git clone --recurse-submodules https://github.com/sanger-pathogens/strain_mapper.git && \
+     cd strain_mapper && \
+     git submodule init
    ```
 
-2. To run with `docker`, use the `-profile docker` option:
+2. To run with Docker containers, use the `-profile docker` option:
 
    ```bash
-   nextflow run main.nf \
-       -profile docker \
-       --manifest_of_reads manifest.csv \
-       --reference /path/to/reference.fna \
-       --outdir my_output
+   nextflow run main.nf -profile docker [options]
    ```
 
-   Other profiles are also supported (`singularity`).  
-   :warning: If no profile is specified the pipeline will run with the Sanger HPC-specific configuration.
+   Similarly, the `singularity` profile enables support for Singularity/Apptainer containers.
+
+   :warning: If no profile is specified the pipeline will run with the Sanger HPC-specific configuration. Non-Sanger users should use either `docker` or `singularity` profiles
 
 3. Once the run has finished successfully and you have inspected the output, clean up intermediate files. The `work/` directory and `.nextflow.log` are useful for troubleshooting — do not delete them until you are satisfied the outputs are correct:
 
@@ -63,7 +60,7 @@ Default quality filters applied during variant filtering:
 
    Alternatively, use `nextflow clean` for more fine-grained control over which runs and intermediate files are removed.
 
-#### Using on the Sanger farm
+#### Using on the Sanger "farm" HPC
 
 First load the latest pipeline module:
 
@@ -80,11 +77,32 @@ strain-mapper --help
 Submit to LSF:
 
 ```bash
-bsub -o output.o -e error.e -q oversubscribed -R "select[mem>4000] rusage[mem=4000]" -M4000 \
-    strain-mapper \
-        --manifest_of_reads manifest.csv \
-        --reference /path/to/reference.fna \
-        --outdir my_output
+jobname="my_strain_mapper_run" # you can edit this!
+bsub -o ${jobname}.%J.o -e ${jobname}.%J.e -q oversubscribed -J ${jobname} -R "select[mem>4000] rusage[mem=4000]" -M4000 \
+    strain-mapper [options]
+```
+
+#### From code archive downloaded from the Github Release section or from Zenodo
+
+Please be aware that the code archive asset attached to a release will have empty folders for the dependcy submodules `assorted-sub-workflows` ([repository](https://github.com/sanger-pathogens/assorted-sub-workflows)) and `lib` (points to `nextflowtool` [repository](https://github.com/sanger-pathogens/nextflowtool)). The code executed from these archives will therefore **NOT** be functional. Unfortunately, the `.git` folder will be missing too, meaning that it is not a working `git` repository and submodule folders _cannot_ be populated with `git submodule init`.
+
+It is thus recommended to use the `git clone` approach described above, adding the commands below to get the code version referred to in the release:
+
+```bash
+git checkout <revision_tag> # e.g. revision_tag can be "v1.8.1"
+git pull --recurse-submodules
+```
+
+### General usage
+
+This pipeline requires a few mandatory options, outlined below:
+
+```sh
+nextflow run main.nf  \
+        --manifest manifest.csv \
+        --outdir "results" \
+        --reference generic_reference.fa \
+        --reference_manifest sample_specific_references.fa
 ```
 
 ### Input
@@ -168,14 +186,19 @@ results/
 
 **Sequencing reads input options**
 
-| Option                | Type     | Default | Description                                                |
-| --------------------- | -------- | ------- | ---------------------------------------------------------- |
-| `--manifest_of_reads` | `path`   | `null`  | Manifest CSV with header `ID,R1,R2` for local FASTQ input. |
-| `--manifest_of_lanes` | `path`   | `null`  | Manifest CSV with iRODS study/run/lane/plex IDs.           |
-| `--studyid`           | `string` | `null`  | iRODS study ID.                                            |
-| `--runid`             | `string` | `null`  | iRODS run ID.                                              |
-| `--laneid`            | `string` | `null`  | iRODS lane ID.                                             |
-| `--plexid`            | `string` | `null`  | iRODS plex ID.                                             |
+Multiple input options are available, and can be combined. Providing at least one is mandatory.
+
+| Option                                          | Type   | Default | Description                                                                                                                                                                                                                   |
+| ----------------------------------------------- | ------ | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--manifest_of_reads`                           | `path` | `null`  | Input manifest CSV with required header `ID,R1,R2`.                                                                                                                                                                           |
+| `--manifest`                                    | `path` | `null`  | Same as `--manifest_of_reads` (alias).                                                                                                                                                                                        |
+| `--manifest_of_lanes`                           | `path` | `null`  | **Sanger users only:** Input manifest CSV for submission of multiple iRODS (meta)data queries; various header fields can be used that refer to iRODS metadata fields, including `sudyid`,`runid`,`laneid`,`plexid` or `type`. |
+| `--manifest_ena`                                | `path` | `null`  | Input manifest for submission of multiple ENA (meta)data queries; no header required, the only required content should be ENA accessions, one per line. This option should be accopanied by the `--accession_type` option.    |
+| `--accession_type`                              | `str`  | `"run"` | One of the following types: `run`, `study`, `sample`.                                                                                                                                                                         |
+| `--manifest_from_dir`                           | `path` | `null`  | Path to a folder containing paired Fastq files; file pairing will be done automatically; see help message from [the executed script](./assorted-sub-workflows/mixed_input/bin/generate_manifest.py).                          |
+| `sudyid`,`runid`,`laneid`,`plexid`, `type`, ... | `str`  | `null`  | **Sanger users only:** Individual fields to be combined to form a single iRODS query (similar syntax as with `--manifest_of_lanes`, but resulting in a separate, additional query).                                           |
+
+For more information, please read [the MIXED_INPUT workflow documentation](./assorted-sub-workflows/README.md).
 
 ---
 
@@ -192,9 +215,11 @@ At least one of these is required.
 
 **Output options**
 
-| Option     | Type   | Default     | Description                          |
-| ---------- | ------ | ----------- | ------------------------------------ |
-| `--outdir` | `path` | `./results` | Directory where results are written. |
+| Option          | Type      | Default     | Description                          |
+| --------------- | --------- | ----------- | ------------------------------------------------------------------------------------------------------ |
+| `--outdir`      | `path`.   | `./results` | Directory where results are written.                                                                   |
+| `--save_fastqc` | `boolean` | `false`     | Save individual FastQC report (both pre- and post-filtering; redundant with combined MultiQC reports). |
+
 
 ---
 
@@ -238,7 +263,7 @@ All dependencies are containerised in publicly available images.
 | Software | Version | Image                                                  |
 | -------- | ------- | ------------------------------------------------------ |
 | Bowtie2  | 2.5.1   | `quay.io/biocontainers/bowtie2:2.5.1--py310h8d7afc0_0` |
-| Samtools | 1.17    | `quay.io/biocontainers/samtools:1.17--hd87286a_2`      |
+| Samtools | 1.17    | `quay.io/biocontainers/samtools:1.22--h96c455f_0`      |
 | Picard   | 3.1.1   | `quay.io/biocontainers/picard:3.1.1--hdfd78af_0`       |
 | bcftools | 1.17    | `quay.io/biocontainers/bcftools:1.17--h3cc50cf_1`      |
 
