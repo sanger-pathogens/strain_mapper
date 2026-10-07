@@ -94,7 +94,7 @@ git pull --recurse-submodules
 
 ### General usage
 
-This pipeline requires a few mandatory options, outlined below:
+Here is a simple example of how to use this pipeline:
 
 ```sh
 nextflow run main.nf  \
@@ -106,6 +106,8 @@ nextflow run main.nf  \
 
 ### Input
 
+No input option is mandatory in itself, but at least one input option must be provided. They also can be combined.
+
 #### Manifest (`--manifest`)
 
 A CSV file with the required header `ID,R1,R2`, containing per-sample paths to paired `.fastq.gz` files:
@@ -116,9 +118,9 @@ sampleA,/path/to/sampleA_1.fastq.gz,/path/to/sampleA_2.fastq.gz
 sampleB,/path/to/sampleB_1.fastq.gz,/path/to/sampleB_2.fastq.gz
 ```
 
-#### Generating a manifest
+> Note: the `--manifest` option is an alias to `--manifest_of_reads`; see [#Parameters] below.
 
-**Sanger users:** the [manifest_generator](https://gitlab.internal.sanger.ac.uk/sanger-pathogens/pipelines/manifest_generator/) tool can generate a compatible `ID,R1,R2` manifest from a directory of FASTQ files or from iRODS.
+**Generating a manifest (Sanger users):** the [manifest_generator](https://gitlab.internal.sanger.ac.uk/sanger-pathogens/pipelines/manifest_generator/) tool can generate a compatible `ID,R1,R2` manifest from a directory of FASTQ files or from iRODS.
 
 #### Other input modes
 
