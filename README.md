@@ -261,7 +261,7 @@ All dependencies are containerised in publicly available images.
 | Software | Version | Image                                                  |
 | -------- | ------- | ------------------------------------------------------ |
 | Bowtie2  | 2.5.1   | `quay.io/biocontainers/bowtie2:2.5.1--py310h8d7afc0_0` |
-| Samtools | 1.17    | `quay.io/biocontainers/samtools:1.22--h96c455f_0`      |
+| Samtools | 1.22    | `quay.io/biocontainers/samtools:1.22--h96c455f_0`      |
 | Picard   | 3.1.1   | `quay.io/biocontainers/picard:3.1.1--hdfd78af_0`       |
 | bcftools | 1.17    | `quay.io/biocontainers/bcftools:1.17--h3cc50cf_1`      |
 
