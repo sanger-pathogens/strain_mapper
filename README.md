@@ -36,9 +36,7 @@ Default quality filters applied during variant filtering:
 1. Clone this repository:
 
    ```bash
-   git clone --recurse-submodules https://github.com/sanger-pathogens/strain_mapper.git && \
-     cd strain_mapper && \
-     git submodule init
+   git clone --recurse-submodules https://github.com/sanger-pathogens/strain_mapper.git
    ```
 
 2. To run with Docker containers, use the `-profile docker` option:
