@@ -141,7 +141,6 @@ Every sample must have a reference to map against. There are two ways to supply 
   ID,reference
   sampleA,/path/to/strain_1.fasta
   sampleB,/path/to/strain_2.fasta
-  sampleC,NA
   ```
 
   `ID` must match a sample ID from the reads input. Reference paths are validated up front and the run fails immediately if one is missing. `NA` means the sample has no specific reference and falls back to `--reference`.
