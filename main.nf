@@ -33,7 +33,6 @@ def printHelp() {
 include { MIXED_INPUT       } from './assorted-sub-workflows/mixed_input/mixed_input.nf'
 include { IRODS_EXTRACTOR   } from './assorted-sub-workflows/irods_extractor/subworkflows/irods.nf'
 include { STRAIN_MAPPER     } from './assorted-sub-workflows/strain_mapper/strain_mapper.nf'
-include { REF_MANIFEST_PARSE } from './assorted-sub-workflows/strain_mapper/subworkflows/ref_manifest.nf'
 
 
 /*
