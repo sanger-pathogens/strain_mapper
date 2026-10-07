@@ -63,7 +63,7 @@ workflow {
             printHelp()
             exit 1
         } else {
-            log.info "No generic reference provided, will use reference manifest to determine references for each sample. Samples without a reference in the manifest will be skipped."
+            log.info "No generic reference provided (option `--reference`), will use reference manifest to determine references for each sample. Samples without a reference in the manifest will be skipped."
         }
     }
 
