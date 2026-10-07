@@ -48,64 +48,8 @@ workflow {
         exit 0
     }
 
-    //
-    // REFERENCE PROCESSING
-    //
-
-    generic_reference = null
-    reference_manifest = null
-
-    if (params.reference) {
-        generic_reference = file(params.reference, checkIfExists: true)
-    } else {
-        if (!params.reference_manifest) {
-            log.error "Either a reference fasta file or a reference manifest must be provided."
-            printHelp()
-            exit 1
-        } else {
-            log.info "No generic reference provided (option `--reference`), will use reference manifest to determine references for each sample. Samples without a reference in the manifest will be skipped."
-        }
-    }
-
-    if (params.reference_manifest) {
-        reference_manifest = file(params.reference_manifest, checkIfExists: true)
-    }
-
-    ch_reference_manifest = channel.empty()
-
-    if (reference_manifest) {
-        REF_MANIFEST_PARSE(reference_manifest)
-
-        REF_MANIFEST_PARSE.out.references
-            .map { metaref, reference -> [metaref.ID, metaref, reference] }
-            .set { ch_reference_manifest }
-    }
-
-    MIXED_INPUT()
-
-    MIXED_INPUT.out.all_reads_ready_ch
-        .map { metaread, reads_1, reads_2 ->
-            [metaread.ID, metaread, reads_1, reads_2]
-        }
-        .join(ch_reference_manifest, remainder: true)
-        .map { row ->
-            def (mid, meta, reads_1, reads_2) = row
-            def reference = row.size() >= 6 ? row[5] : null
-            [meta, reads_1, reads_2, reference ?: generic_reference] // prefer manifest reference if available
-        }
-        .filter { meta, reads_1, reads_2, reference ->
-            // meta is null for reference manifest rows whose ID matched no input sample,
-            // reference is null for samples with no manifest entry and no --reference
-            meta != null && reference != null
-        }
-        .set { all_reads_ready_to_map_with_ref_ch }
-    //
-    // SUBWORKFLOW: actual processing;
-    // please refer to the Nextflow subworkflow strain_mapper
-    // in the submodule repository assorted-sub-workflows
-    //
-
-    STRAIN_MAPPER(all_reads_ready_to_map_with_ref_ch)
+    MIXED_INPUT
+    | STRAIN_MAPPER
 }
 
 workflow.onComplete {
