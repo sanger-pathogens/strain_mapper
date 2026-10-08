@@ -10,7 +10,7 @@ def logo = NextflowTool.logo(workflow, params.monochrome_logs)
 
 log.info logo
 
-NextflowTool.commandLineParams(workflow.commandLine, log, params.monochrome_logs)
+NextflowTool.commandLineParams(workflow.commandLine, params, log, params.monochrome_logs)
 
 
 def printHelp() {
@@ -47,25 +47,8 @@ workflow {
         exit 0
     }
 
-    //
-    // REFERENCE PROCESSING 
-    //
-    reference = file(params.reference, checkIfExists: true)
-
-    //
-    // SUBWORKFLOW: Read in samplesheet, validate and stage input files
-    //
-
     MIXED_INPUT
-    | set{all_reads_ready_to_map_ch}
-
-    //
-    // SUBWORKFLOW: actual processing; 
-    // please refer to  the Nextflow subworkflow strain_mapper
-    // in the submodule repository assorted-sub-workflows
-    //
-
-    STRAIN_MAPPER( all_reads_ready_to_map_ch, reference )
+    | STRAIN_MAPPER
 }
 
 workflow.onComplete {
