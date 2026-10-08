@@ -143,10 +143,10 @@ Every sample must have a reference to map against. There are two ways to supply 
   sampleB,/path/to/strain_2.fasta
   ```
 
-  `ID` must match a sample ID from the reads input. Reference paths are validated up front and the run fails immediately if one is missing. Use `NA` in the `reference` field to indicate the sample has no specific reference and falls back to `--reference`; note however that such sample can just be omitted from the manifest of references.
+  `ID` must match a sample ID from the reads input. Reference paths are validated up front and the run fails immediately if one is missing. Sample that have no specific reference associated to them can just be omitted from the manifest of references, so that the pipeline will fall back on the generic reference genome specified by `--reference`.
 
-At least one of the two options is required. A sample listed in the reference manifest is mapped against its own reference; any sample not listed is mapped against `--reference`.  
-If `--drop_without_ref` is `true`, samples with neither are dropped from the run (with a warning); if `--drop_without_ref` is `false` (default), an error will be raised indicating you need to supply `--reference` as a fallback unless you intend to process only the manifested samples.
+At least one of the two options is required. A sample listed in the reference manifest is mapped against its own reference; any sample not listed is mapped against `--reference`, if provided.  
+If `--drop_without_ref` is `true` and `--reference` is not provided, input samples not listed in the reference manifest will be dropped from the run (with a warning); if `--drop_without_ref` is `false` (default), an error will be raised indicating you need to supply `--reference` as a fallback unless you intend to process only the manifested samples.
 
 Each distinct reference is indexed once, regardless of how many samples use it. Consensus FASTA filenames include the reference they were called against, so results from a multi-reference run remain distinguishable.
 
@@ -208,7 +208,7 @@ At least one of these is required.
 | Option                 | Type   | Default | Description                                                                                                                                                            |
 | ---------------------- | ------ | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `--reference`          | `path` | `null`  | Path to a reference FASTA file, used for every sample that has no entry in `--reference_manifest`.                                                                     |
-| `--reference_manifest` | `path` | `null`  | Manifest CSV with header `ID,reference`, assigning a reference FASTA per sample ID. Samples not listed fall back to `--reference`. Use `NA` to leave a row unassigned. |
+| `--reference_manifest` | `path` | `null`  | Manifest CSV with header `ID,reference`, assigning a reference FASTA per sample ID. Samples not listed fall back to `--reference`. |
 | `--drop_without_ref`   | `bool` | `false` | Should samples with neither be dropped from the run. if `false`, an error is raised.                                                                                   |
 
 ---
