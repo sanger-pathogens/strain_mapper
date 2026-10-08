@@ -193,7 +193,7 @@ Multiple input options are available, and can be combined. Providing at least on
 | `--manifest`                                    | `path` | `null`  | Same as `--manifest_of_reads` (alias).                                                                                                                                                                                        |
 | `--manifest_of_lanes`                           | `path` | `null`  | **Sanger users only:** Input manifest CSV for submission of multiple iRODS (meta)data queries; various header fields can be used that refer to iRODS metadata fields, including `sudyid`,`runid`,`laneid`,`plexid` or `type`. |
 | `--manifest_ena`                                | `path` | `null`  | Input manifest for submission of multiple ENA (meta)data queries; no header required, the only required content should be ENA accessions, one per line. This option should be accopanied by the `--accession_type` option.    |
-| `--accession_type`                              | `str`  | `"run"` | One of the following types: `run`, `study`, `sample`.                                                                                                                                                                         |
+| `--accession_type`                              | `str`  | `"run"` | One of the following ENA accession types: `run`, `study`, `sample`.                                                                                                                                                                         |
 | `--manifest_from_dir`                           | `path` | `null`  | Path to a folder containing paired Fastq files; file pairing will be done automatically; see help message from [the executed script](./assorted-sub-workflows/mixed_input/bin/generate_manifest.py).                          |
 | `sudyid`,`runid`,`laneid`,`plexid`, `type`, ... | `str`  | `null`  | **Sanger users only:** Individual fields to be combined to form a single iRODS query (similar syntax as with `--manifest_of_lanes`, but resulting in a separate, additional query).                                           |
 
@@ -209,7 +209,7 @@ At least one of these is required.
 | ---------------------- | ------ | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `--reference`          | `path` | `null`  | Path to a reference FASTA file, used for every sample that has no entry in `--reference_manifest`.                                                                     |
 | `--reference_manifest` | `path` | `null`  | Manifest CSV with header `ID,reference`, assigning a reference FASTA per sample ID. Samples not listed fall back to `--reference`. |
-| `--drop_without_ref`   | `bool` | `false` | Should samples with neither be dropped from the run. if `false`, an error is raised.                                                                                   |
+| `--drop_without_ref`   | `bool` | `false` | Samples are dropped from the run if they have no reference supplied. If `false`, an error is raised instead.                                                                                   |
 
 ---
 
