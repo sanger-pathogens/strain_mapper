@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/1272307777.svg)](https://doi.org/10.5281/zenodo.21776310)
+[![DOI](https://zenodo.org/badge/1272307777.svg)](https://doi.org/10.5281/zenodo.23260816)
 
 # Strain Mapper
 
