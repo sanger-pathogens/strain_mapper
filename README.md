@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/1272307777.svg)](https://doi.org/10.5281/zenodo.21776310)
+
 # Strain Mapper
 
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A521.04.0-23aa62.svg?labelColor=000000)](https://www.nextflow.io/)
